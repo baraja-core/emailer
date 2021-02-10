@@ -28,6 +28,9 @@ final class Configuration
 	private array $adminEmails;
 
 
+	/**
+	 * @param string[] $adminEmails
+	 */
 	public function __construct(string $tempDir, bool $useQueue, array $adminEmails = [])
 	{
 		$this->tempDir = $tempDir;

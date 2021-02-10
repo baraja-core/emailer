@@ -22,9 +22,13 @@ abstract class BaseTemplateRenderer implements Renderer
 
 	private string $tempDir;
 
+	/** @var mixed[] */
 	private array $defaultParameters;
 
 
+	/**
+	 * @param mixed[] $defaultParameters
+	 */
 	final public function injectPrimary(
 		string $tempDir,
 		Localization $localization,

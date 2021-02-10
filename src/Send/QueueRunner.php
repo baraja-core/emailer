@@ -137,7 +137,7 @@ final class QueueRunner
 		$this->logger->log(
 			Log::LEVEL_INFO,
 			'E-mail was successfully sent to '
-			. '"' . ($email->getMessage() === null ? '???' : $email->getMessage()->getTo()) . '" '
+			. '"' . $email->getMessage()->getTo() . '" '
 			. 'with subject "' . trim($message->getSubject() ?? 'NULL') . '". '
 			. 'Preparation took "' . Helper::formatMicroTime((int) $email->getPreparingDuration()) . '" '
 			. 'and sending took "' . Helper::formatMicroTime((int) $email->getSendingDuration()) . '"',
