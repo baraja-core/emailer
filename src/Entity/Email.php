@@ -15,7 +15,7 @@ use Doctrine\ORM\Mapping\Index;
  * @ORM\Entity()
  * @ORM\Table(
  *    name="core__emailer_email",
- *	  indexes={
+ *    indexes={
  *       @Index(name="core__emailer_email_status", columns={"status"})
  *    }
  * )
