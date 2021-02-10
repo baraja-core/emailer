@@ -14,6 +14,7 @@
 		"nette/utils": "^3.0",
 		"latte/latte": "^2.5",
 		"baraja-core/localization": "^2.0",
+		"baraja-core/dynamic-configuration": "^2.0",
 		"baraja-core/html-to-text": "^2.0",
 		"baraja-core/doctrine": "^3.0",
 		"baraja-core/doctrine-mail-message": "^2.0"
