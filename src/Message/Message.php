@@ -56,10 +56,7 @@ final class Message extends \Nette\Mail\Message
 	}
 
 
-	/**
-	 * @param string|int|\DateTimeInterface $date
-	 */
-	public function setSendEarliestAt($date): void
+	public function setSendEarliestAt(string|int|\DateTimeInterface $date): void
 	{
 		$this->sendEarliestAt = new \DateTimeImmutable(DateTime::from($date)->format('Y-m-d H:i:s.u'));
 	}

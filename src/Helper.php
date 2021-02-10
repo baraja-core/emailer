@@ -20,7 +20,7 @@ final class Helper
 			return number_format($microTime, 3, '.', ' ') . ' s';
 		}
 
-		return number_format($microTime * 1000, 2, '.', ' ') . ' ms';
+		return number_format($microTime * 1_000, 2, '.', ' ') . ' ms';
 	}
 
 
@@ -28,7 +28,7 @@ final class Helper
 	{
 		return $microTime >= 1
 			? number_format($microTime, 3, '.', ' ') . ' s'
-			: number_format($microTime * 1000, 2, '.', ' ') . ' ms';
+			: number_format($microTime * 1_000, 2, '.', ' ') . ' ms';
 	}
 
 

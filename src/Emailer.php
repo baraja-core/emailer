@@ -65,8 +65,7 @@ final class Emailer implements Mailer
 		Localization $localization,
 		?Translator $translator = null,
 		?Fixer $fixer = null
-	)
-	{
+	) {
 		$this->configuration = $configuration;
 		$this->messageEntity = new MessageEntity($attachmentBasePath, $entityManager);
 		$this->logger = new EmailerLogger($entityManager);
@@ -142,7 +141,7 @@ final class Emailer implements Mailer
 					}
 
 					return '<p>CRON without args</p>';
-				})())
+				})()),
 			);
 
 		foreach (array_merge($this->configuration->getAdminEmails(), $additionalEmails ?? []) as $email) {
@@ -163,8 +162,7 @@ final class Emailer implements Mailer
 		string $type,
 		array $parameters = [],
 		bool $overwriteMailParameter = true
-	): MessageReadyToSend
-	{
+	): MessageReadyToSend {
 		if (class_exists($type) === false) {
 			throw new \InvalidArgumentException('Service class "' . $type . '" does not exist.');
 		}
@@ -187,7 +185,7 @@ final class Emailer implements Mailer
 
 		try {
 			$locale = $parameters['locale'] ?? $this->localization->getLocale();
-		} catch (\Throwable $e) {
+		} catch (\Throwable) {
 			$locale = $this->localization->getDefaultLocale();
 		}
 

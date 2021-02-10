@@ -74,7 +74,7 @@ final class QueueRunner
 			if (isset($emails[0]) === true) {
 				$email = $emails[0];
 			} else {
-				usleep($this->configuration->getQueueCheckIterationDelay() * 1000 * 1000);
+				usleep($this->configuration->getQueueCheckIterationDelay() * 1_000 * 1_000);
 				continue;
 			}
 

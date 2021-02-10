@@ -55,20 +55,18 @@ class Email
 	 * (How long did it take to call $mailer->send($mail), so connected to SMTP, etc.).
 	 * Used to quickly detect problems with the mail server.
 	 *
-	 * @var float|string|null
 	 * @ORM\Column(type="decimal", nullable=true)
 	 */
-	private $sendingDuration;
+	private float|string |null $sendingDuration;
 
 	/**
 	 * How many seconds (to the nearest ms) did it take to prepare / generate the e-mail.
 	 * It is used for quick detection of problematic situations,
 	 * when generating some e-mails can brutally slow down the whole queue.
 	 *
-	 * @var float|string|null
 	 * @ORM\Column(type="decimal", nullable=true)
 	 */
-	private $preparingDuration;
+	private float|string |null $preparingDuration;
 
 	/** @ORM\Column(type="string") */
 	private string $ip;

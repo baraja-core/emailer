@@ -31,8 +31,7 @@ abstract class BaseTemplateRenderer implements Renderer
 		LinkGenerator $linkGenerator,
 		?Translator $translator = null,
 		array $defaultParameters = []
-	): void
-	{
+	): void {
 		$this->tempDir = $tempDir;
 		$this->localization = $localization;
 		$this->linkGenerator = $linkGenerator;
@@ -74,7 +73,7 @@ abstract class BaseTemplateRenderer implements Renderer
 					if (isset($parameters['locale']) === false) {
 						try {
 							$locale = $this->localization->getLocale();
-						} catch (\Throwable $e) {
+						} catch (\Throwable) {
 							$locale = $this->localization->getDefaultLocale();
 						}
 						$parameters['locale'] = $locale;
@@ -103,7 +102,7 @@ abstract class BaseTemplateRenderer implements Renderer
 					return 'href="{$linkGenerator->link('
 						. '"' . htmlspecialchars(str_replace('Front:Front:', 'Front:', $route), ENT_QUOTES) . '", '
 						. '[' . implode(', ', $renderParameters) . '])}"';
-				} catch (InvalidLinkException $e) {
+				} catch (InvalidLinkException) {
 					return 'href="' . Url::get()->getBaseUrl() . '"';
 				}
 			},

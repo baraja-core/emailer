@@ -91,9 +91,7 @@ class Log
 	}
 
 
-	/**
-	 * @internal
-	 */
+	/** @internal */
 	public function setInsertedDate(?\DateTimeInterface $insertedDate): self
 	{
 		$this->insertedDate = $insertedDate ?? new \DateTimeImmutable('now');
