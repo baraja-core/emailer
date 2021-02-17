@@ -62,11 +62,9 @@ final class QueueRunner
 						)
 					)')
 					->andWhere('email.sendEarliestAt IS NULL OR email.sendEarliestAt <= :now')
-					->setParameters([
-						'statusInQueue' => Email::STATUS_IN_QUEUE,
-						'statusWaitingForNextAttempt' => Email::STATUS_WAITING_FOR_NEXT_ATTEMPT,
-						'now' => new \DateTimeImmutable('now'),
-					])
+					->setParameter('statusInQueue', Email::STATUS_IN_QUEUE)
+					->setParameter('statusWaitingForNextAttempt', Email::STATUS_WAITING_FOR_NEXT_ATTEMPT)
+					->setParameter('now', new \DateTimeImmutable('now'))
 					->orderBy('message.priority', 'ASC')
 					->setMaxResults(1),
 			))->getIterator();
