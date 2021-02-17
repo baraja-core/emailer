@@ -76,7 +76,7 @@ final class TemplateRenderer
 			. (isset(self::$hintRendererPackages[$format]) ? ' Did you install "' . self::$hintRendererPackages[$format] . '"?' : '')
 			. ($this->renderers === []
 				? ' Empty renderers list.'
-				: "\n\n" . 'Used renderers: ' . implode(', ', array_map(static fn (Renderer $renderer): string => \get_class($renderer), $this->renderers))),
+				: "\n\n" . 'Used renderers: ' . implode(', ', array_map(static fn(Renderer $renderer): string => \get_class($renderer), $this->renderers))),
 		);
 	}
 }
