@@ -14,13 +14,10 @@ use Tracy\Debugger;
 
 final class EmailerDaemon extends Command
 {
-	private QueueRunner $runner;
-
-
-	public function __construct(QueueRunner $runner)
-	{
+	public function __construct(
+		private QueueRunner $runner
+	) {
 		parent::__construct();
-		$this->runner = $runner;
 	}
 
 

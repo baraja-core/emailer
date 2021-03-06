@@ -16,8 +16,6 @@ use Tracy\Debugger;
 
 final class QueueRunner
 {
-	private EntityManager $entityManager;
-
 	private Sender $sender;
 
 	private MessageEntity $messageEntity;
@@ -27,9 +25,10 @@ final class QueueRunner
 	private Configuration $configuration;
 
 
-	public function __construct(EntityManager $entityManager, Emailer $emailer)
-	{
-		$this->entityManager = $entityManager;
+	public function __construct(
+		private EntityManager $entityManager,
+		Emailer $emailer
+	) {
 		$this->configuration = $emailer->getConfiguration();
 		$this->sender = $emailer->getSender();
 		$this->messageEntity = $emailer->getMessageEntity();
