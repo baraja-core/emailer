@@ -32,21 +32,11 @@ use Tracy\ILogger;
  */
 final class Emailer implements Mailer
 {
-	private Configuration $configuration;
-
 	private MessageEntity $messageEntity;
 
 	private EmailerLogger $logger;
 
 	private Sender $sender;
-
-	private Container $container;
-
-	private Localization $localization;
-
-	private EntityManager $entityManager;
-
-	private ?Translator $translator;
 
 	private ?TemplateRenderer $templateRenderer = null;
 
@@ -57,23 +47,18 @@ final class Emailer implements Mailer
 	 * @param mixed[] $config
 	 */
 	public function __construct(
-		Configuration $configuration,
-		EntityManager $entityManager,
+		private Configuration $configuration,
+		private EntityManager $entityManager,
+		private Container $container,
+		private Localization $localization,
+		private ?Translator $translator = null,
 		string $attachmentBasePath,
 		array $config,
-		Container $container,
-		Localization $localization,
-		?Translator $translator = null,
 		?Fixer $fixer = null
 	) {
-		$this->configuration = $configuration;
 		$this->messageEntity = new MessageEntity($attachmentBasePath, $entityManager);
 		$this->logger = new EmailerLogger($entityManager);
 		$this->sender = new Sender($config);
-		$this->container = $container;
-		$this->localization = $localization;
-		$this->translator = $translator;
-		$this->entityManager = $entityManager;
 		$this->fixer = $fixer ?? new DefaultFixer;
 	}
 

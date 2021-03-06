@@ -7,15 +7,10 @@ namespace Baraja\Emailer;
 
 final class MessageReadyToSend
 {
-	private Message $message;
-
-	private Emailer $emailer;
-
-
-	public function __construct(Message $message, Emailer $emailer)
-	{
-		$this->message = $message;
-		$this->emailer = $emailer;
+	public function __construct(
+		private Message $message,
+		private Emailer $emailer
+	) {
 	}
 
 
