@@ -72,6 +72,16 @@ final class EmailerExtension extends CompilerExtension
 		FileSystem::createDir($attachmentBasePath = $builder->parameters['tempDir'] . '/emailer-attachments');
 		$builder->addAlias('mail.mailer', Emailer::class);
 
+		if (is_array($dicMailConfiguration) === false) {
+			throw new \RuntimeException(
+				'Your project Nette Mailer configuration is broken, '
+				. 'because type "' . get_debug_type($dicMailConfiguration) . '" given. '
+				. 'Rewriting default configuration is not recommended. '
+				. 'Did you use native service?' . "\n"
+				. 'To solve this issue: Please check configuration of service "mail.mailer".',
+			);
+		}
+
 		$builder->addDefinition($this->prefix('emailer'))
 			->setFactory(Emailer::class)
 			->setArgument('config', array_merge($dicMailConfiguration, $config['mail'] ?? []))
