@@ -30,6 +30,9 @@ final class TemplateRenderer
 		LinkGenerator $linkGenerator,
 		?Translator $translator = null
 	) {
+		$renderers[] = new TextRenderer;
+		$renderers[] = new HtmlRenderer;
+		$renderers[] = new LatteRenderer;
 		foreach ($renderers as $renderer) {
 			if ($renderer instanceof BaseTemplateRenderer) {
 				$renderer->injectPrimary($tempDir, $localization, $linkGenerator, $translator);
