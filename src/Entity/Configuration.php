@@ -27,15 +27,18 @@ final class Configuration
 	/** @var string[] */
 	private array $adminEmails;
 
+	private ?string $defaultFrom;
+
 
 	/**
 	 * @param string[] $adminEmails
 	 */
-	public function __construct(string $tempDir, bool $useQueue, array $adminEmails = [])
+	public function __construct(string $tempDir, bool $useQueue, array $adminEmails = [], ?string $defaultFrom = null)
 	{
 		$this->tempDir = $tempDir;
 		$this->useQueue = $useQueue;
 		$this->adminEmails = $adminEmails;
+		$this->defaultFrom = $defaultFrom;
 	}
 
 
@@ -114,5 +117,11 @@ final class Configuration
 	public function getMaxAllowedAttempts(): int
 	{
 		return 5;
+	}
+
+
+	public function getDefaultFrom(): ?string
+	{
+		return $this->defaultFrom;
 	}
 }

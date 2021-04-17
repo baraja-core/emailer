@@ -32,6 +32,7 @@ final class EmailerExtension extends CompilerExtension
 			'mail' => Expect::array(),
 			'useQueue' => Expect::bool(true),
 			'adminEmails' => Expect::arrayOf(Expect::string()),
+			'defaultFrom' => Expect::string(),
 		])->castTo('array');
 	}
 
@@ -67,6 +68,7 @@ final class EmailerExtension extends CompilerExtension
 				'tempDir' => $builder->parameters['tempDir'],
 				'useQueue' => $config['useQueue'] ?? true,
 				'adminEmails' => $config['adminEmails'] ?? [],
+				'defaultFrom' => $config['defaultFrom'] ?? null,
 			]);
 
 		FileSystem::createDir($attachmentBasePath = $builder->parameters['tempDir'] . '/emailer-attachments');
