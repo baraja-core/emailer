@@ -32,9 +32,10 @@ final class LatteRenderer extends BaseTemplateRenderer
 	private function getEngine(): Engine
 	{
 		$engine = new Engine;
-		if ($this->translator !== null) {
-			$engine->addFilter('translate', function (FilterInfo $fi, ...$args): string {
-				return $this->translator->translate(...$args);
+		$translator = $this->translator;
+		if ($translator !== null) {
+			$engine->addFilter('translate', function (FilterInfo $fi, ...$args) use ($translator): string {
+				return $translator->translate(...$args);
 			});
 		}
 
