@@ -187,9 +187,11 @@ final class Emailer implements Mailer
 		$message->setSubject($subject);
 		$message->setHtmlBody($this->renderTemplate($templatePath, $parameters));
 
-		if (isset($parameters['from']) === true) {
-			$message->setFrom($this->fixer->fix($parameters['from']));
-		}
+		$from = $parameters['from']
+			?? $this->configuration->getDefaultFrom()
+			?? throw new \InvalidArgumentException('Parameter "from" does not exist. Did you defined default configuration?');
+
+		$message->setFrom($this->fixer->fix($from));
 		if (isset($parameters['to']) === true) {
 			$message->clearHeader('To');
 			$message->addTo($this->fixer->fix($parameters['to']));
