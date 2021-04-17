@@ -51,7 +51,7 @@ final class Emailer implements Mailer
 		private EntityManager $entityManager,
 		private Container $container,
 		private Localization $localization,
-		private ?Translator $translator = null,
+		private ?Translator $translator,
 		string $attachmentBasePath,
 		array $config,
 		?Fixer $fixer = null
@@ -196,9 +196,11 @@ final class Emailer implements Mailer
 		}
 		if (isset($parameters['cc']) === true) {
 			$message->clearHeader('Cc');
-			foreach (explode(';', $parameters['cc']) as $cc) {
-				if (Validators::isEmail($cc)) {
-					$message->addCc($this->fixer->fix($cc));
+			foreach ((array) $parameters['cc'] as $ccs) {
+				foreach (explode(';', $ccs) as $cc) {
+					if (Validators::isEmail($cc)) {
+						$message->addCc($this->fixer->fix($cc));
+					}
 				}
 			}
 		}
