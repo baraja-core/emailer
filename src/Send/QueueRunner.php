@@ -87,14 +87,15 @@ final class QueueRunner
 
 				if ($email->getFailedAttemptsCount() >= $this->configuration->getMaxAllowedAttempts()) {
 					$email->setStatus($e instanceof SendException ? Email::STATUS_SENDING_ERROR : Email::STATUS_PREPARING_ERROR);
-					$email->addNote(date('Y-m-d H:i:s') . ' - ' . $e->getMessage());
+					$email->addNote(date('Y-m-d H:i:s') . ': ' . $e->getMessage());
 				} else { // We'll try sending again in a few minutes at the earliest
 					$email->setStatus(Email::STATUS_WAITING_FOR_NEXT_ATTEMPT);
 					$email->setSendEarliestNextAttemptAt(new \DateTimeImmutable('now + 15 minutes'));
 					$email->incrementFailedAttemptsCount();
 				}
-				$this->entityManager->flush();
 			}
+			$this->entityManager->flush();
+			$this->entityManager->clear();
 
 			usleep((int) ($this->configuration->getQueueEmailDelay() * 1_000 * 1_000));
 		}
@@ -115,7 +116,6 @@ final class QueueRunner
 		if (trim($message->getHtmlBody()) === '' && trim($message->getBody()) === '') {
 			$email->setStatus(Email::STATUS_PREPARING_ERROR);
 			$email->addNote(date('Y-m-d H:i:s') . ' - E-mail was not sent (empty body)');
-			$this->entityManager->flush();
 
 			return;
 		}
@@ -129,7 +129,6 @@ final class QueueRunner
 		$email->setPreparingDuration($builderDuration);
 		$email->setSendingDuration($mailerDuration);
 		$email->setDatetimeSent(new \DateTimeImmutable('now'));
-		$this->entityManager->flush();
 
 		$this->logger->log(
 			Log::LEVEL_INFO,
