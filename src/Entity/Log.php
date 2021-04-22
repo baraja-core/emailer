@@ -48,8 +48,9 @@ class Log
 
 	public function __construct(string $level, string $message, ?Email $email = null)
 	{
-		if (\in_array($level = strtoupper($level), [self::LEVEL_WARNING, self::LEVEL_ERROR, self::LEVEL_INFO], true) === false) {
-			trigger_error('Log: Level "' . $level . '" is not supported.');
+		$level = strtoupper($level);
+		if (\in_array($level, [self::LEVEL_WARNING, self::LEVEL_ERROR, self::LEVEL_INFO], true) === false) {
+			trigger_error(__METHOD__ . ': Level "' . $level . '" is not supported.');
 			$level = self::LEVEL_ERROR;
 		}
 

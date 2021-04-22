@@ -16,11 +16,11 @@ final class Helper
 
 	public static function formatDurationFrom(int $fromMicroTime, ?int $nowMicroTime = null): string
 	{
-		if (($microTime = ($nowMicroTime ?: (int) microtime(true)) - $fromMicroTime) >= 1) {
-			return number_format($microTime, 3, '.', ' ') . ' s';
-		}
+		$microTime = ($nowMicroTime ?: (int) microtime(true)) - $fromMicroTime;
 
-		return number_format($microTime * 1_000, 2, '.', ' ') . ' ms';
+		return $microTime >= 1
+			? number_format($microTime, 3, '.', ' ') . ' s'
+			: number_format($microTime * 1_000, 2, '.', ' ') . ' ms';
 	}
 
 
@@ -39,8 +39,11 @@ final class Helper
 			if (isset($_SERVER['REMOTE_ADDR'])) {
 				if (\in_array($_SERVER['REMOTE_ADDR'], ['::1', '0.0.0.0', 'localhost'], true)) {
 					$ip = '127.0.0.1';
-				} elseif (($ip = filter_var($_SERVER['REMOTE_ADDR'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) === false) {
-					$ip = '127.0.0.1';
+				} else {
+					$ip = filter_var($_SERVER['REMOTE_ADDR'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4);
+					if ($ip === false) {
+						$ip = '127.0.0.1';
+					}
 				}
 			} else {
 				$ip = '127.0.0.1';

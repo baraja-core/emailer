@@ -51,7 +51,7 @@ abstract class BaseTemplateRenderer implements Renderer
 	{
 		try {
 			$locale = $this->localization->getLocale();
-		} catch (\Throwable $e) {
+		} catch (\Throwable) {
 			$locale = $this->localization->getDefaultLocale();
 		}
 

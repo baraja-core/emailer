@@ -22,7 +22,7 @@ final class EmailerLogger
 	 */
 	public function log(string $level, string $message, ?Email $email = null): void
 	{
-		$this->entityManager->persist($log = new Log($level, $message, $email));
+		$this->entityManager->persist(new Log($level, $message, $email));
 		$this->entityManager->flush();
 	}
 }

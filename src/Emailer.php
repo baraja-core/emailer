@@ -83,7 +83,8 @@ final class Emailer implements Mailer
 
 	public function sendNow(NetteMessage $message): void
 	{
-		if (($email = $this->insertMessageToQueue($message)) !== null) {
+		$email = $this->insertMessageToQueue($message);
+		if ($email !== null) {
 			if ($email->getStatus() === Email::STATUS_SENT) {
 				return;
 			}
@@ -119,7 +120,8 @@ final class Emailer implements Mailer
 						$url = Url::get()->getCurrentUrl();
 
 						return '<p>URL: <a href="' . $url . '" target="_blank">' . $url . '</a></p>';
-					} catch (\Throwable $e) {
+					} catch (\Throwable) {
+						// Silence is golden.
 					}
 					if (isset($_SERVER['argv'][0])) {
 						return '<p>CRON - ARGS: ' . implode(' | ', $_SERVER['argv']) . '</p>';
@@ -174,8 +176,11 @@ final class Emailer implements Mailer
 			$locale = $this->localization->getDefaultLocale();
 		}
 
-		if (($templatePath = $email->getTemplate($locale)) === null) {
-			throw new EmailerException('Email template for mail "' . $type . '" and locale "' . $locale . '" does not exist.');
+		$templatePath = $email->getTemplate($locale);
+		if ($templatePath === null) {
+			throw new EmailerException(
+				'Email template for mail "' . $type . '" and locale "' . $locale . '" does not exist.',
+			);
 		}
 
 		$subject = $parameters['subject'] ?? $message->getSubject();
@@ -189,7 +194,11 @@ final class Emailer implements Mailer
 
 		$from = $parameters['from']
 			?? $this->configuration->getDefaultFrom()
-			?? throw new \InvalidArgumentException('Parameter "from" does not exist. Did you defined default configuration?');
+			?? null;
+
+		if ($from === null) {
+			throw new \InvalidArgumentException('Parameter "from" does not exist. Did you defined default configuration?');
+		}
 
 		$message->setFrom($this->fixer->fix($from));
 		if (isset($parameters['to']) === true) {
@@ -287,7 +296,8 @@ final class Emailer implements Mailer
 		$email = new Email($this->messageEntity->toEntity($message));
 		try {
 			$email->setLocale($this->localization->getLocale());
-		} catch (\Throwable $e) {
+		} catch (\Throwable) {
+			// Locale should be unknown
 		}
 		if ($sendEarliestAt !== 'now') {
 			$email->setSendEarliestAt(DateTime::from($sendEarliestAt));
@@ -295,7 +305,8 @@ final class Emailer implements Mailer
 			$email->setSendEarliestAt($message->getSendEarliestAt());
 		}
 
-		$this->entityManager->persist($email)->flush();
+		$this->entityManager->persist($email);
+		$this->entityManager->flush();
 
 		return $email;
 	}
