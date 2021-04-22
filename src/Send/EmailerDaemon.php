@@ -11,6 +11,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Tracy\Debugger;
+use Tracy\ILogger;
 
 final class EmailerDaemon extends Command
 {
@@ -40,7 +41,7 @@ final class EmailerDaemon extends Command
 
 			return 0;
 		} catch (\Throwable $e) {
-			Debugger::log($e);
+			Debugger::log($e, ILogger::CRITICAL);
 			$output->writeln('<error>' . $e->getMessage() . '</error>');
 
 			return 1;
