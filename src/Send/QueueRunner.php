@@ -136,8 +136,8 @@ final class QueueRunner
 			'E-mail was successfully sent to '
 			. '"' . $email->getMessage()->getTo() . '" '
 			. 'with subject "' . trim($message->getSubject() ?? 'NULL') . '". '
-			. 'Preparation took "' . Helper::formatMicroTime((int) $email->getPreparingDuration()) . '" '
-			. 'and sending took "' . Helper::formatMicroTime((int) $email->getSendingDuration()) . '"',
+			. 'Preparation took "' . Helper::formatMicroTime((float) $email->getPreparingDuration()) . '" '
+			. 'and sending took "' . Helper::formatMicroTime((float) $email->getSendingDuration()) . '"',
 			$email,
 		);
 	}
