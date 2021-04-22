@@ -13,6 +13,7 @@ use Baraja\Emailer\Entity\Log;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Nette\Mail\SendException;
 use Tracy\Debugger;
+use Tracy\ILogger;
 
 final class QueueRunner
 {
@@ -81,7 +82,7 @@ final class QueueRunner
 				$result++;
 			} catch (\Throwable $e) {
 				echo 'E';
-				Debugger::log($e);
+				Debugger::log($e, ILogger::CRITICAL);
 
 				$this->logger->log(Log::LEVEL_ERROR, 'Failed to send: ' . $e->getMessage() . ', details on Tracy logger.', $email);
 

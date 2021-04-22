@@ -14,6 +14,8 @@ use Nette\DI\MissingServiceException;
 use Nette\Schema\Expect;
 use Nette\Schema\Schema;
 use Nette\Utils\FileSystem;
+use Tracy\Debugger;
+use Tracy\ILogger;
 
 final class EmailerExtension extends CompilerExtension
 {
@@ -53,6 +55,10 @@ final class EmailerExtension extends CompilerExtension
 			$dicMailConfiguration = $netteMailerArguments;
 			$builder->removeDefinition('mail.mailer');
 		} catch (MissingServiceException $e) {
+			Debugger::log(
+				new \LogicException('Mailer is broken: ' . $e->getMessage(), $e->getCode(), $e),
+				ILogger::EXCEPTION,
+			);
 		}
 
 		/** @var mixed[] $config */
