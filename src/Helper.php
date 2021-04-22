@@ -24,7 +24,7 @@ final class Helper
 	}
 
 
-	public static function formatMicroTime(int $microTime): string
+	public static function formatMicroTime(int|float $microTime): string
 	{
 		return $microTime >= 1
 			? number_format($microTime, 3, '.', ' ') . ' s'
