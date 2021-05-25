@@ -22,26 +22,28 @@ final class DefaultFixer implements Fixer
 			return $email;
 		}
 
-		return $user . '@' . ($this->getSuggestion(self::DOMAINS, $domain, $tld) ?? $domain);
+		return $user . '@' . ($this->getSuggestion($domain, $tld) ?? $domain);
 	}
 
 
 	/**
 	 * Looks for a string from possibilities that is most similar to value, but not the same (for 8-bit encoding).
 	 *
-	 * @param string[] $possibilities
 	 */
-	private function getSuggestion(array $possibilities, string $value, string $tld): ?string
+	private function getSuggestion(string $value, string $tld): ?string
 	{
 		$best = null;
 		$min = (strlen($value) / 4 + 1) * 10 + .1;
-		foreach ($possibilities as $item) {
+		foreach (self::DOMAINS as $item) {
 			if ((explode('.', $item)[1] ?? '') !== $tld) {
 				continue;
 			}
-			if ($item !== $value && ($len = levenshtein($item, $value, 10, 11, 10)) < $min) {
-				$min = $len;
-				$best = $item;
+			if ($item !== $value) {
+				$len = levenshtein($item, $value, 10, 11, 10);
+				if ($len < $min) {
+					$min = $len;
+					$best = $item;
+				}
 			}
 		}
 
