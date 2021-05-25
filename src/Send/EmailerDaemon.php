@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Baraja\Emailer\Command;
 
 
+use Baraja\Doctrine\EntityManager;
+use Baraja\Emailer\GarbageCollector;
 use Baraja\Emailer\Helper;
 use Baraja\Emailer\QueueRunner;
 use Symfony\Component\Console\Command\Command;
@@ -16,7 +18,8 @@ use Tracy\ILogger;
 final class EmailerDaemon extends Command
 {
 	public function __construct(
-		private QueueRunner $runner
+		private QueueRunner $runner,
+		private EntityManager $entityManager,
 	) {
 		parent::__construct();
 	}
@@ -38,6 +41,14 @@ final class EmailerDaemon extends Command
 			$this->runner->run();
 
 			$output->writeln('End time: ' . date('Y-m-d H:i:s') . ' [' . Helper::formatDurationFrom((int) $start) . ']');
+			$output->writeln('Start garbage collector.');
+			try {
+				(new GarbageCollector($this->entityManager))->run();
+				$output->writeln('Garbage collector run successfully.');
+			} catch (\Throwable $e) {
+				Debugger::log($e, ILogger::CRITICAL);
+				$output->writeln('Garbage collector failed: <error>' . htmlspecialchars($e->getMessage()) . '</error>');
+			}
 
 			return 0;
 		} catch (\Throwable $e) {
