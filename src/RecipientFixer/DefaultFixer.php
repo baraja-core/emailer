@@ -28,7 +28,6 @@ final class DefaultFixer implements Fixer
 
 	/**
 	 * Looks for a string from possibilities that is most similar to value, but not the same (for 8-bit encoding).
-	 *
 	 */
 	private function getSuggestion(string $value, string $tld): ?string
 	{
