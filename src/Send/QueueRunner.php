@@ -82,14 +82,15 @@ final class QueueRunner
 				$result++;
 			} catch (\Throwable $e) {
 				echo 'E';
-				Debugger::log($e, ILogger::CRITICAL);
 
 				$this->logger->log(Log::LEVEL_ERROR, 'Failed to send: ' . $e->getMessage() . ', details on Tracy logger.', $email);
 
 				if ($email->getFailedAttemptsCount() >= $this->configuration->getMaxAllowedAttempts()) {
+					Debugger::log($e, ILogger::CRITICAL);
 					$email->setStatus($e instanceof SendException ? Email::STATUS_SENDING_ERROR : Email::STATUS_PREPARING_ERROR);
 					$email->addNote(date('Y-m-d H:i:s') . ': ' . $e->getMessage());
 				} else { // We'll try sending again in a few minutes at the earliest
+					Debugger::log($e, ILogger::DEBUG);
 					$email->setStatus(Email::STATUS_WAITING_FOR_NEXT_ATTEMPT);
 					$email->setSendEarliestNextAttemptAt(new \DateTimeImmutable('now + 15 minutes'));
 					$email->incrementFailedAttemptsCount();
