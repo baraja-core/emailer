@@ -69,7 +69,7 @@ final class GarbageCollector
 			->leftJoin('email.message', 'message')
 			->andWhere('message.htmlBody IS NOT NULL')
 			->andWhere('email.status = :status')
-			->andWhere('log.datetimeInserted < :date')
+			->andWhere('email.datetimeInserted < :date')
 			->setParameter('status', Email::STATUS_SENT)
 			->setParameter('date', 'now - ' . $interval)
 			->setMaxResults(1000)
