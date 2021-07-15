@@ -35,12 +35,7 @@ class Email
 	/** @ORM\OneToOne(targetEntity="\Baraja\DoctrineMailMessage\DoctrineMessage") */
 	private DoctrineMessage $message;
 
-	/**
-	 * @ORM\Column(
-	 *    type="string",
-	 *    columnDefinition="ENUM('in-queue','not-ready-to-queue','waiting-for-next-attempt','sent','preparing-error','sending-error')"
-	 * )
-	 */
+	/** @ORM\Column(type="string", length=32) */
 	private string $status = self::STATUS_IN_QUEUE;
 
 	/**
