@@ -33,9 +33,13 @@ final class Configuration
 	/**
 	 * @param string[] $adminEmails
 	 */
-	public function __construct(string $tempDir, bool $useQueue, array $adminEmails = [], ?string $defaultFrom = null)
-	{
-		$this->tempDir = $tempDir;
+	public function __construct(
+		?string $tempDir = null,
+		bool $useQueue = false,
+		array $adminEmails = [],
+		?string $defaultFrom = null
+	) {
+		$this->tempDir = $tempDir ?? get_temp_dir() . '/emailer';
 		$this->useQueue = $useQueue;
 		$this->adminEmails = $adminEmails;
 		$this->defaultFrom = $defaultFrom;
