@@ -27,7 +27,7 @@ abstract class BaseTemplateRenderer implements Renderer
 
 
 	/**
-	 * @param mixed[] $defaultParameters
+	 * @param array<string, mixed> $defaultParameters
 	 */
 	final public function injectPrimary(
 		string $tempDir,

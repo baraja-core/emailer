@@ -12,14 +12,14 @@ use Nette\Mail\SmtpMailer;
 
 final class Sender implements Mailer
 {
-	/** @var mixed[] */
+	/** @var array<string, mixed> */
 	private array $config;
 
 	private ?Mailer $mailer = null;
 
 
 	/**
-	 * @param mixed[] $config
+	 * @param array<string, mixed> $config
 	 */
 	public function __construct(array $config)
 	{

@@ -14,13 +14,11 @@ use Nette\DI\MissingServiceException;
 use Nette\Schema\Expect;
 use Nette\Schema\Schema;
 use Nette\Utils\FileSystem;
-use Tracy\Debugger;
-use Tracy\ILogger;
 
 final class EmailerExtension extends CompilerExtension
 {
 	/**
-	 * @return string[]
+	 * @return array<int, string>
 	 */
 	public static function mustBeDefinedBefore(): array
 	{
@@ -42,9 +40,9 @@ final class EmailerExtension extends CompilerExtension
 	public function beforeCompile(): void
 	{
 		$builder = $this->getContainerBuilder();
-		OrmAnnotationsExtension::addAnnotationPathToManager($builder, 'Baraja\Emailer\Entity', __DIR__ . '/Entity');
-
-		$dicMailConfiguration = [];
+		if (class_exists(OrmAnnotationsExtension::class)) {
+			OrmAnnotationsExtension::addAnnotationPathToManager($builder, 'Baraja\Emailer\Entity', __DIR__ . '/Entity');
+		}
 		try {
 			/** @var ServiceDefinition $netteMailer */
 			$netteMailer = $builder->getDefinition('mail.mailer');
@@ -55,13 +53,10 @@ final class EmailerExtension extends CompilerExtension
 			$dicMailConfiguration = $netteMailerArguments;
 			$builder->removeDefinition('mail.mailer');
 		} catch (MissingServiceException $e) {
-			Debugger::log(
-				new \LogicException('Mailer is broken: ' . $e->getMessage(), $e->getCode(), $e),
-				ILogger::EXCEPTION,
-			);
+			throw new \LogicException('Mailer service is broken: ' . $e->getMessage(), $e->getCode(), $e);
 		}
 
-		/** @var mixed[] $config */
+		/** @var array<string, mixed> $config */
 		$config = $this->getConfig();
 
 		if (isset($builder->parameters['tempDir']) === false) {

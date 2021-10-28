@@ -32,38 +32,6 @@ final class Helper
 	}
 
 
-	public static function userIp(): string
-	{
-		static $ip = null;
-
-		if ($ip === null) {
-			if (isset($_SERVER['HTTP_CF_CONNECTING_IP'])) { // Cloudflare support
-				$ip = $_SERVER['HTTP_CF_CONNECTING_IP'];
-			} elseif (isset($_SERVER['REMOTE_ADDR']) === true) {
-				$ip = $_SERVER['REMOTE_ADDR'];
-				if (preg_match('/^(?:127|10)\.0\.0\.[12]?\d{1,2}$/', $ip)) {
-					if (isset($_SERVER['HTTP_X_REAL_IP'])) {
-						$ip = $_SERVER['HTTP_X_REAL_IP'];
-					} elseif (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-						$ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
-					}
-				}
-			} else {
-				$ip = '127.0.0.1';
-			}
-			if (in_array($ip, ['::1', '0.0.0.0', 'localhost'], true)) {
-				$ip = '127.0.0.1';
-			}
-			$filter = filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4);
-			if ($filter === false) {
-				$ip = '127.0.0.1';
-			}
-		}
-
-		return $ip;
-	}
-
-
 	/**
 	 * @param mixed[] $left
 	 * @param mixed[] $right
@@ -82,5 +50,30 @@ final class Helper
 		}
 
 		return $left;
+	}
+
+
+	/**
+	 * Checks if the value is a valid email address. It does not verify that the domain actually exists,
+	 * only the syntax is verified.
+	 */
+	public static function isEmail(string $value): bool
+	{
+		$atom = "[-a-z0-9!#$%&'*+/=?^_`{|}~]"; // RFC 5322 unquoted characters in local-part
+		$alpha = "a-z\x80-\xFF"; // superset of IDN
+
+		$pattern = sprintf(
+			'(^("([ !#-[\\]-~]*|\\\\[ -~])+"|%s+(\\.%s+)*)@([0-9%s]([-0-9%s]{0,61}[0-9%s])?\\.)+[%s]([-0-9%s]{0,17}[%s])?$)Dix',
+			$atom,
+			$atom,
+			$alpha,
+			$alpha,
+			$alpha,
+			$alpha,
+			$alpha,
+			$alpha
+		);
+
+		return (bool) preg_match($pattern, $value);
 	}
 }

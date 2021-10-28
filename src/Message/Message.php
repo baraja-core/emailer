@@ -6,7 +6,6 @@ namespace Baraja\Emailer;
 
 
 use Baraja\HtmlToText\Html2Text;
-use Nette\Utils\DateTime;
 
 final class Message extends \Nette\Mail\Message
 {
@@ -58,7 +57,18 @@ final class Message extends \Nette\Mail\Message
 
 	public function setSendEarliestAt(string|int|\DateTimeInterface $date): void
 	{
-		$this->sendEarliestAt = new \DateTimeImmutable(DateTime::from($date)->format('Y-m-d H:i:s.u'));
+		try {
+			if ($date instanceof \DateTimeInterface) {
+				$date = new \DateTimeImmutable($date->format('Y-m-d H:i:s.u'), $date->getTimezone());
+			} elseif (is_numeric($date)) {
+				$date = new \DateTimeImmutable('@' . $date, new \DateTimeZone(date_default_timezone_get()));
+			} else { // textual or null
+				$date = new \DateTimeImmutable($date, new \DateTimeZone(date_default_timezone_get()));
+			}
+		} catch (\Throwable) {
+			$date = new \DateTimeImmutable('now');
+		}
+		$this->sendEarliestAt = $date;
 	}
 
 

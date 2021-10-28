@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Baraja\Emailer;
 
 
-use Baraja\Doctrine\EntityManager;
 use Baraja\DoctrineMailMessage\MessageEntity;
 use Baraja\Emailer\Email\Email as EmailService;
 use Baraja\Emailer\Entity\Configuration;
@@ -16,16 +15,14 @@ use Baraja\Emailer\Renderer\Renderer;
 use Baraja\Emailer\Renderer\TemplateRenderer;
 use Baraja\Localization\Localization;
 use Baraja\Url\Url;
+use Doctrine\ORM\EntityManagerInterface;
 use Nette\Application\LinkGenerator;
 use Nette\DI\Container;
 use Nette\DI\MissingServiceException;
 use Nette\Localization\Translator;
 use Nette\Mail\Mailer;
 use Nette\Mail\Message as NetteMessage;
-use Nette\Utils\DateTime;
-use Nette\Utils\Validators;
-use Tracy\Debugger;
-use Tracy\ILogger;
+use Psr\Log\LoggerInterface;
 
 /**
  * Emailer is a complex Mail services tool for smart e-mail management.
@@ -44,14 +41,15 @@ final class Emailer implements Mailer
 
 
 	/**
-	 * @param mixed[] $config
+	 * @param array<string, mixed> $config
 	 */
 	public function __construct(
 		private Configuration $configuration,
-		private EntityManager $entityManager,
+		private EntityManagerInterface $entityManager,
 		private Container $container,
 		private Localization $localization,
 		private ?Translator $translator,
+		private ?LoggerInterface $psrLogger,
 		string $attachmentBasePath,
 		array $config,
 		?Fixer $fixer = null
@@ -91,12 +89,14 @@ final class Emailer implements Mailer
 			try {
 				$this->sender->send($this->messageEntity->toMessage($email->getMessage()));
 				$email->setStatus(Email::STATUS_SENT);
-				$email->setDatetimeSent(DateTime::from('now'));
+				$email->setDatetimeSent(new \DateTimeImmutable('now'));
 			} catch (\Throwable $e) {
-				Debugger::log($e, ILogger::CRITICAL);
+				if ($this->psrLogger !== null) {
+					$this->psrLogger->critical($e->getMessage(), ['exception' => $e]);
+				}
 				$email->setStatus(Email::STATUS_WAITING_FOR_NEXT_ATTEMPT);
 				$email->incrementFailedAttemptsCount();
-				$email->setSendEarliestNextAttemptAt(DateTime::from('now + 10 seconds'));
+				$email->setSendEarliestNextAttemptAt(new \DateTimeImmutable('now + 10 seconds'));
 			}
 			$this->entityManager->flush();
 		}
@@ -104,7 +104,7 @@ final class Emailer implements Mailer
 
 
 	/**
-	 * @param string[]|null $additionalEmails
+	 * @param array<int, string>|null $additionalEmails
 	 */
 	public function sendMessageToAdministrators(string $subject, string $message, ?array $additionalEmails = null): void
 	{
@@ -132,7 +132,7 @@ final class Emailer implements Mailer
 			);
 
 		foreach (array_merge($this->configuration->getAdminEmails(), $additionalEmails ?? []) as $email) {
-			if (Validators::isEmail($email) === true) {
+			if (Helper::isEmail($email) === true) {
 				$messageEntity->addTo($this->fixer->fix($email));
 			}
 		}
@@ -142,7 +142,7 @@ final class Emailer implements Mailer
 
 
 	/**
-	 * @param mixed[] $parameters
+	 * @param array<string, mixed> $parameters
 	 * @throws EmailerException
 	 */
 	public function getEmailServiceByType(
@@ -209,7 +209,7 @@ final class Emailer implements Mailer
 			$message->clearHeader('Cc');
 			foreach ((array) $parameters['cc'] as $ccs) {
 				foreach (explode(';', $ccs) as $cc) {
-					if (Validators::isEmail($cc)) {
+					if (Helper::isEmail($cc)) {
 						$message->addCc($this->fixer->fix($cc));
 					}
 				}
@@ -218,7 +218,7 @@ final class Emailer implements Mailer
 		if (isset($parameters['bcc']) === true) {
 			$message->clearHeader('Bcc');
 			foreach (explode(';', $parameters['bcc']) as $bcc) {
-				if (Validators::isEmail($bcc)) {
+				if (Helper::isEmail($bcc)) {
 					$message->addBcc($this->fixer->fix($bcc));
 				}
 			}
@@ -232,7 +232,7 @@ final class Emailer implements Mailer
 
 
 	/**
-	 * @param mixed[] $parameters
+	 * @param array<string, mixed> $parameters
 	 */
 	public function renderTemplate(string $templatePath, array $parameters = []): string
 	{
@@ -246,7 +246,13 @@ final class Emailer implements Mailer
 				$renderers[] = $this->container->getService((string) $serviceName);
 			}
 
-			$this->templateRenderer = new TemplateRenderer($this->configuration->getTempDir(), $renderers, $this->localization, $linkGenerator, $this->translator);
+			$this->templateRenderer = new TemplateRenderer(
+				tempDir: $this->configuration->getTempDir(),
+				renderers: $renderers,
+				localization: $this->localization,
+				linkGenerator: $linkGenerator,
+				translator: $this->translator,
+			);
 		}
 
 		return $this->templateRenderer->render($templatePath, $parameters);
@@ -300,7 +306,7 @@ final class Emailer implements Mailer
 			// Locale should be unknown
 		}
 		if ($sendEarliestAt !== 'now') {
-			$email->setSendEarliestAt(DateTime::from($sendEarliestAt));
+			$email->setSendEarliestAt(new \DateTimeImmutable($sendEarliestAt));
 		} elseif ($message instanceof Message) {
 			$email->setSendEarliestAt($message->getSendEarliestAt());
 		}

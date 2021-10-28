@@ -16,11 +16,12 @@
 		"baraja-core/localization": "^2.0",
 		"baraja-core/dynamic-configuration": "^2.0",
 		"baraja-core/html-to-text": "^2.0",
-		"baraja-core/doctrine": "^3.0",
-		"baraja-core/doctrine-mail-message": "^2.0"
+		"baraja-core/doctrine-mail-message": "^2.0",
+		"baraja-core/network": "^1.0"
 	},
 	"require-dev": {
-		"tracy/tracy": "^2.6",
+		"psr/log": "^3.0",
+		"baraja-core/doctrine": "^3.0",
 		"phpstan/phpstan": "^0.12.74",
 		"phpstan/phpstan-nette": "^0.12.14",
 		"phpstan/phpstan-doctrine": "^0.12.10",

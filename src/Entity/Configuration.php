@@ -24,14 +24,14 @@ final class Configuration
 	/** Delay between operations to check if something is in the queue. */
 	private int $queueCheckIterationDelay = 2;
 
-	/** @var string[] */
+	/** @var array<int, string> */
 	private array $adminEmails;
 
 	private ?string $defaultFrom;
 
 
 	/**
-	 * @param string[] $adminEmails
+	 * @param array<int, string> $adminEmails
 	 */
 	public function __construct(
 		?string $tempDir = null,
@@ -65,7 +65,7 @@ final class Configuration
 
 
 	/**
-	 * @return string[]
+	 * @return array<int, string>
 	 */
 	public function getAdminEmails(): array
 	{
@@ -74,7 +74,7 @@ final class Configuration
 
 
 	/**
-	 * @param string[] $adminEmails
+	 * @param array<int, string> $adminEmails
 	 */
 	public function setAdminEmails(array $adminEmails): void
 	{

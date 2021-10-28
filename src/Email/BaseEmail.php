@@ -18,7 +18,7 @@ abstract class BaseEmail implements Email
 
 	public function getName(): string
 	{
-		return self::class;
+		return static::class;
 	}
 
 
@@ -35,7 +35,7 @@ abstract class BaseEmail implements Email
 
 
 	/**
-	 * @return string[]|null[]
+	 * @return array<string, mixed>
 	 */
 	public function getParameters(): array
 	{

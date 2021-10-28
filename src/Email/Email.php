@@ -16,7 +16,7 @@ interface Email
 	public function getTemplate(string $locale): ?string;
 
 	/**
-	 * @return mixed[]
+	 * @return array<string, mixed>
 	 */
 	public function getParameters(): array;
 

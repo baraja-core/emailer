@@ -5,14 +5,15 @@ declare(strict_types=1);
 namespace Baraja\Emailer;
 
 
-use Baraja\Doctrine\EntityManager;
 use Baraja\Emailer\Entity\Email;
 use Baraja\Emailer\Entity\Log;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityRepository;
 
 final class GarbageCollector
 {
 	public function __construct(
-		private EntityManager $entityManager,
+		private EntityManagerInterface $entityManager,
 	) {
 	}
 
@@ -28,8 +29,11 @@ final class GarbageCollector
 
 	private function removeCommonLogs(string $interval = '14 days'): void
 	{
-		/** @var Log[] $logs */
-		$logs = $this->entityManager->getRepository(Log::class)
+		/** @var array<int, Log> $logs */
+		$logs = (new EntityRepository(
+			$this->entityManager,
+			$this->entityManager->getClassMetadata(Log::class)
+		))
 			->createQueryBuilder('log')
 			->select('PARTIAL log.{id}')
 			->where('log.email IS NULL')
@@ -45,8 +49,11 @@ final class GarbageCollector
 
 	private function removeEmailLogs(string $interval = '3 months'): void
 	{
-		/** @var Log[] $logs */
-		$logs = $this->entityManager->getRepository(Log::class)
+		/** @var array<int, Log> $logs */
+		$logs = (new EntityRepository(
+			$this->entityManager,
+			$this->entityManager->getClassMetadata(Log::class)
+		))
 			->createQueryBuilder('log')
 			->select('PARTIAL log.{id}')
 			->where('log.email IS NOT NULL')
@@ -63,7 +70,10 @@ final class GarbageCollector
 	private function removeMessageBodies(string $interval = '3 months'): void
 	{
 		/** @var Email[] $emails */
-		$emails = $this->entityManager->getRepository(Email::class)
+		$emails = (new EntityRepository(
+			$this->entityManager,
+			$this->entityManager->getClassMetadata(Email::class)
+		))
 			->createQueryBuilder('email')
 			->select('email, message')
 			->leftJoin('email.message', 'message')
@@ -84,7 +94,7 @@ final class GarbageCollector
 
 
 	/**
-	 * @param object[] $entities
+	 * @param array<int, object> $entities
 	 */
 	private function remove(array $entities): void
 	{

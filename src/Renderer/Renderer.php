@@ -8,7 +8,7 @@ namespace Baraja\Emailer\Renderer;
 interface Renderer
 {
 	/**
-	 * @param mixed[] $parameters
+	 * @param array<string, mixed> $parameters
 	 */
 	public function render(string $template, array $parameters = []): string;
 

@@ -14,7 +14,7 @@ final class HtmlRenderer extends BaseTemplateRenderer
 
 
 	/**
-	 * @param mixed[] $parameters
+	 * @param array<string, mixed> $parameters
 	 */
 	public function render(string $template, array $parameters = []): string
 	{

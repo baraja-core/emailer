@@ -5,25 +5,17 @@ declare(strict_types=1);
 namespace Baraja\Emailer\Entity;
 
 
-use Baraja\Doctrine\Identifier\IdentifierUnsigned;
 use Baraja\DoctrineMailMessage\DoctrineMessage;
-use Baraja\Emailer\Helper;
+use Baraja\Localization\Localization;
+use Baraja\Network\Ip;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\Index;
 
-/**
- * @ORM\Entity()
- * @ORM\Table(
- *    name="core__emailer_email",
- *    indexes={
- *       @Index(name="core__emailer_email_status", columns={"status"})
- *    }
- * )
- */
+#[ORM\Entity]
+#[ORM\Table(name: 'core__emailer_email')]
+#[Index(columns: ['status'], name: 'core__emailer_email_status')]
 class Email
 {
-	use IdentifierUnsigned;
-
 	public const
 		STATUS_IN_QUEUE = 'in-queue',
 		STATUS_NOT_READY_TO_QUEUE = 'not-ready-to-queue',
@@ -32,84 +24,83 @@ class Email
 		STATUS_PREPARING_ERROR = 'preparing-error',
 		STATUS_SENDING_ERROR = 'sending-error';
 
-	/** @ORM\OneToOne(targetEntity="\Baraja\DoctrineMailMessage\DoctrineMessage") */
+	#[ORM\Id]
+	#[ORM\Column(type: 'integer', unique: true, options: ['unsigned' => true])]
+	#[ORM\GeneratedValue]
+	protected ?int $id;
+
+	#[ORM\OneToOne(targetEntity: DoctrineMessage::class)]
 	private DoctrineMessage $message;
 
-	/** @ORM\Column(type="string", length=32) */
+	#[ORM\Column(type: 'string', length: 32)]
 	private string $status = self::STATUS_IN_QUEUE;
 
-	/**
-	 * If value will be bigger than limit status is changed to 'sending-error'.
-	 *
-	 * @ORM\Column(type="smallint")
-	 */
+	/** If value will be bigger than limit status is changed to 'sending-error'. */
+	#[ORM\Column(type: 'smallint')]
 	private int $failedAttemptsCount = 0;
 
 	/**
 	 * How many seconds (to the nearest ms) it took to send the email
 	 * (How long did it take to call $mailer->send($mail), so connected to SMTP, etc.).
 	 * Used to quickly detect problems with the mail server.
-	 *
-	 * @ORM\Column(type="decimal", nullable=true)
 	 */
+	#[ORM\Column(type: 'decimal', nullable: true)]
 	private float|string |null $sendingDuration;
 
 	/**
 	 * How many seconds (to the nearest ms) did it take to prepare / generate the e-mail.
 	 * It is used for quick detection of problematic situations,
 	 * when generating some e-mails can brutally slow down the whole queue.
-	 *
-	 * @ORM\Column(type="decimal", nullable=true)
 	 */
+	#[ORM\Column(type: 'decimal', nullable: true)]
 	private float|string |null $preparingDuration;
 
-	/** @ORM\Column(type="string") */
+	#[ORM\Column(type: 'string')]
 	private string $ip;
 
-	/**
-	 * @var string[]|null
-	 * @ORM\Column(type="json", nullable=true)
-	 */
+	/** @var array<int, string>|null */
+	#[ORM\Column(type: 'json', nullable: true)]
 	private ?array $note = null;
 
-	/** @ORM\Column(type="string", length=2, nullable=true) */
+	#[ORM\Column(type: 'string', length: 2, nullable: true)]
 	private ?string $locale = null;
 
-	/**
-	 * Date when the message can be sent first (NULL = send as soon as possible).
-	 *
-	 * @ORM\Column(type="datetime", nullable=true)
-	 */
+	/** Date when the message can be sent first (NULL = send as soon as possible). */
+	#[ORM\Column(type: 'datetime', nullable: true)]
 	private ?\DateTimeInterface $sendEarliestAt = null;
 
-	/**
-	 * Date and time when the next attempt to send the e-mail may occur first (in case of repeated attempts).
-	 *
-	 * @ORM\Column(type="datetime", nullable=true)
-	 */
+	/** Date and time when the next attempt to send the e-mail may occur first (in case of repeated attempts). */
+	#[ORM\Column(type: 'datetime', nullable: true)]
 	private ?\DateTimeInterface $sendEarliestNextAttemptAt = null;
 
-	/** @ORM\Column(type="datetime") */
+	#[ORM\Column(type: 'datetime')]
 	private \DateTimeInterface $datetimeInserted;
 
-	/**
-	 * Date the message was actually sent (NULL = message was not sent).
-	 *
-	 * @ORM\Column(type="datetime", nullable=true)
-	 */
+	/** Date the message was actually sent (NULL = message was not sent). */
+	#[ORM\Column(type: 'datetime', nullable: true)]
 	private ?\DateTimeInterface $datetimeSent = null;
 
 
 	public function __construct(DoctrineMessage $message)
 	{
 		$this->message = $message;
-		$this->ip = Helper::userIp();
+		$this->ip = Ip::get();
 		$this->datetimeInserted = new \DateTimeImmutable('now');
 	}
 
 
+	public function getId(): ?int
+	{
+		if ($this->id === null) {
+			throw new \RuntimeException('Entity ID does not exist yet. Did you call ->persist() method first?');
+		}
+
+		return (int) $this->id;
+	}
+
+
 	/**
-	 * @return string[]
+	 * @return array<int, string>
 	 */
 	public static function getStatuses(): array
 	{
@@ -216,7 +207,10 @@ class Email
 
 	public function setLocale(?string $locale): void
 	{
-		$this->locale = strtolower(trim($locale ?? '')) ?: null;
+		if ($locale !== null) {
+			$locale = Localization::normalize($locale);
+		}
+		$this->locale = $locale;
 	}
 
 

@@ -9,8 +9,8 @@ final class TemplateValidator
 {
 	private const PATTERNS = [
 		'latte' => '~{\$([a-zA-Z0-9_]+)~',
-		'twig' => '{{\s*([a-zA-Z0-9_]+)',
-		'txt' => '{{\s*([a-zA-Z0-9_]+)',
+		'twig' => '~{{\s*([a-zA-Z0-9_]+)~',
+		'txt' => '~{{\s*([a-zA-Z0-9_]+)~',
 	];
 
 

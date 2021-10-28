@@ -5,15 +5,15 @@ declare(strict_types=1);
 namespace Baraja\Emailer;
 
 
-use Baraja\Doctrine\EntityManager;
 use Baraja\DoctrineMailMessage\MessageEntity;
 use Baraja\Emailer\Entity\Configuration;
 use Baraja\Emailer\Entity\Email;
 use Baraja\Emailer\Entity\Log;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Nette\Mail\SendException;
-use Tracy\Debugger;
-use Tracy\ILogger;
+use Psr\Log\LoggerInterface;
 
 final class QueueRunner
 {
@@ -27,7 +27,8 @@ final class QueueRunner
 
 
 	public function __construct(
-		private EntityManager $entityManager,
+		private EntityManagerInterface $entityManager,
+		private ?LoggerInterface $psrLogger,
 		Emailer $emailer
 	) {
 		$this->configuration = $emailer->getConfiguration();
@@ -50,7 +51,10 @@ final class QueueRunner
 
 			/** @var Email[] $emails */
 			$emails = (new Paginator(
-				$this->entityManager->getRepository(Email::class)
+				(new EntityRepository(
+					$this->entityManager,
+					$this->entityManager->getClassMetadata(Email::class)
+				))
 					->createQueryBuilder('email')
 					->select('email, message')
 					->leftJoin('email.message', 'message')
@@ -83,14 +87,22 @@ final class QueueRunner
 			} catch (\Throwable $e) {
 				echo 'E';
 
-				$this->logger->log(Log::LEVEL_ERROR, 'Failed to send: ' . $e->getMessage() . ', details on Tracy logger.', $email);
+				$this->logger->log(
+					level: Log::LEVEL_ERROR,
+					message: 'Failed to send: ' . $e->getMessage() . ', details has been logged.',
+					email: $email,
+				);
 
 				if ($email->getFailedAttemptsCount() >= $this->configuration->getMaxAllowedAttempts()) {
-					Debugger::log($e, ILogger::CRITICAL);
+					if ($this->psrLogger !== null) {
+						$this->psrLogger->critical($e->getMessage(), ['exception' => $e]);
+					}
 					$email->setStatus($e instanceof SendException ? Email::STATUS_SENDING_ERROR : Email::STATUS_PREPARING_ERROR);
 					$email->addNote(date('Y-m-d H:i:s') . ': ' . $e->getMessage());
 				} else { // We'll try sending again in a few minutes at the earliest
-					Debugger::log($e, ILogger::DEBUG);
+					if ($this->psrLogger !== null) {
+						$this->psrLogger->debug($e->getMessage(), ['exception' => $e]);
+					}
 					$email->setStatus(Email::STATUS_WAITING_FOR_NEXT_ATTEMPT);
 					$email->setSendEarliestNextAttemptAt(new \DateTimeImmutable('now + 15 minutes'));
 					$email->incrementFailedAttemptsCount();

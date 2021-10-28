@@ -8,7 +8,6 @@ namespace Baraja\Emailer\Renderer;
 use Baraja\Localization\Localization;
 use Nette\Application\LinkGenerator;
 use Nette\Localization\Translator;
-use Nette\Utils\FileSystem;
 
 final class TemplateRenderer
 {
@@ -44,11 +43,11 @@ final class TemplateRenderer
 
 
 	/**
-	 * @param mixed[] $parameters
+	 * @param array<string, mixed> $parameters
 	 */
 	public function render(string $templatePath, array $parameters = []): string
 	{
-		$template = FileSystem::read($templatePath);
+		$template = $this->read($templatePath);
 		$format = strtolower((string) preg_replace('/^.*\.([a-zA-Z0-9]+)$/', '$1', $templatePath));
 		$basicParameters = [];
 		$lastException = null;
@@ -81,5 +80,16 @@ final class TemplateRenderer
 				? ' Empty renderers list.'
 				: "\n\n" . 'Used renderers: ' . implode(', ', array_map(static fn(Renderer $renderer): string => $renderer::class, $this->renderers))),
 		);
+	}
+
+
+	private function read(string $file): string
+	{
+		$content = @file_get_contents($file); // @ is escalated to exception
+		if ($content === false) {
+			throw new \RuntimeException('Unable to read file "' . $file . '"". ' . (error_get_last()['message'] ?? ''));
+		}
+
+		return $content;
 	}
 }

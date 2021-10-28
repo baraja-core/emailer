@@ -5,17 +5,12 @@ declare(strict_types=1);
 namespace Baraja\Emailer\Entity;
 
 
-use Baraja\Doctrine\Identifier\IdentifierUnsigned;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity()
- * @ORM\Table(name="core__emailer_log")
- */
+#[ORM\Entity]
+#[ORM\Table(name: 'core__emailer_log')]
 class Log
 {
-	use IdentifierUnsigned;
-
 	public const
 		LEVEL_WARNING = 'WARNING',
 		LEVEL_ERROR = 'ERROR',
@@ -33,16 +28,21 @@ class Log
 		5 => self::LEVEL_ERROR,
 	];
 
-	/** @ORM\Column(type="smallint") */
+	#[ORM\Id]
+	#[ORM\Column(type: 'integer', unique: true, options: ['unsigned' => true])]
+	#[ORM\GeneratedValue]
+	protected ?int $id;
+
+	#[ORM\Column(type: 'smallint')]
 	private int $level;
 
-	/** @ORM\Column(type="text") */
+	#[ORM\Column(type: 'text')]
 	private string $message;
 
-	/** @ORM\ManyToOne(targetEntity="Email") */
+	#[ORM\ManyToOne(targetEntity: Email::class)]
 	private ?Email $email;
 
-	/** @ORM\Column(type="datetime", nullable=true) */
+	#[ORM\Column(type: 'datetime', nullable: true)]
 	private \DateTimeInterface $insertedDate;
 
 
@@ -58,6 +58,16 @@ class Log
 		$this->message = $message;
 		$this->email = $email;
 		$this->insertedDate = new \DateTimeImmutable('now');
+	}
+
+
+	public function getId(): ?int
+	{
+		if ($this->id === null) {
+			throw new \RuntimeException('Entity ID does not exist yet. Did you call ->persist() method first?');
+		}
+
+		return (int) $this->id;
 	}
 
 
@@ -93,10 +103,8 @@ class Log
 
 
 	/** @internal */
-	public function setInsertedDate(?\DateTimeInterface $insertedDate): self
+	public function setInsertedDate(?\DateTimeInterface $insertedDate): void
 	{
 		$this->insertedDate = $insertedDate ?? new \DateTimeImmutable('now');
-
-		return $this;
 	}
 }
