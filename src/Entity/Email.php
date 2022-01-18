@@ -14,6 +14,7 @@ use Doctrine\ORM\Mapping\Index;
 #[ORM\Entity]
 #[ORM\Table(name: 'core__emailer_email')]
 #[Index(columns: ['status'], name: 'core__emailer_email_status')]
+#[Index(columns: ['tag'], name: 'core__emailer_tag')]
 class Email
 {
 	public const
@@ -64,6 +65,10 @@ class Email
 
 	#[ORM\Column(type: 'string', length: 2, nullable: true)]
 	private ?string $locale = null;
+
+	/** Short identifier to group together a related emails. */
+	#[ORM\Column(type: 'string', length: 32, nullable: true)]
+	private ?string $tag = null;
 
 	/** Date when the message can be sent first (NULL = send as soon as possible). */
 	#[ORM\Column(type: 'datetime', nullable: true)]
@@ -211,6 +216,25 @@ class Email
 			$locale = Localization::normalize($locale);
 		}
 		$this->locale = $locale;
+	}
+
+
+	public function getTag(): ?string
+	{
+		return $this->tag;
+	}
+
+
+	public function setTag(?string $tag): void
+	{
+		if ($tag !== null) {
+			$tag = trim($tag);
+			$tag = strtolower($tag);
+			if ($tag === '') {
+				$tag = null;
+			}
+		}
+		$this->tag = $tag;
 	}
 
 
