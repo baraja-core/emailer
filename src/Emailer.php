@@ -82,24 +82,22 @@ final class Emailer implements Mailer
 	public function sendNow(NetteMessage $message): void
 	{
 		$email = $this->insertMessageToQueue($message);
-		if ($email !== null) {
-			if ($email->getStatus() === Email::STATUS_SENT) {
-				return;
-			}
-			try {
-				$this->sender->send($this->messageEntity->toMessage($email->getMessage()));
-				$email->setStatus(Email::STATUS_SENT);
-				$email->setDatetimeSent(new \DateTimeImmutable('now'));
-			} catch (\Throwable $e) {
-				if ($this->psrLogger !== null) {
-					$this->psrLogger->critical($e->getMessage(), ['exception' => $e]);
-				}
-				$email->setStatus(Email::STATUS_WAITING_FOR_NEXT_ATTEMPT);
-				$email->incrementFailedAttemptsCount();
-				$email->setSendEarliestNextAttemptAt(new \DateTimeImmutable('now + 10 seconds'));
-			}
-			$this->entityManager->flush();
+		if ($email->getStatus() === Email::STATUS_SENT) {
+			return;
 		}
+		try {
+			$this->sender->send($this->messageEntity->toMessage($email->getMessage()));
+			$email->setStatus(Email::STATUS_SENT);
+			$email->setDatetimeSent(new \DateTimeImmutable('now'));
+		} catch (\Throwable $e) {
+			if ($this->psrLogger !== null) {
+				$this->psrLogger->critical($e->getMessage(), ['exception' => $e]);
+			}
+			$email->setStatus(Email::STATUS_WAITING_FOR_NEXT_ATTEMPT);
+			$email->incrementFailedAttemptsCount();
+			$email->setSendEarliestNextAttemptAt(new \DateTimeImmutable('now + 10 seconds'));
+		}
+		$this->entityManager->flush();
 	}
 
 
@@ -289,12 +287,10 @@ final class Emailer implements Mailer
 	}
 
 
-	private function insertMessageToQueue(NetteMessage $message, string $sendEarliestAt = 'now'): ?Email
+	private function insertMessageToQueue(NetteMessage $message, string $sendEarliestAt = 'now'): Email
 	{
 		if (trim($message->getBody()) === '' && trim($message->getHtmlBody()) === '') {
-			trigger_error(__METHOD__ . ': Empty mail (no body)');
-
-			return null;
+			throw new \InvalidArgumentException(__METHOD__ . ': Empty mail (no body)');
 		}
 		if (\count($message->getAttachments()) > 0) {
 			$sendEarliestAt .= ' + 1 minute';
