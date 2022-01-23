@@ -67,23 +67,23 @@ final class Emailer implements Mailer
 	 * When sending messages, please prefer own Message entity from this package.
 	 * Attachments will be physically stored on disk.
 	 */
-	public function send(NetteMessage $mail): void
+	public function send(NetteMessage $mail): Email
 	{
 		$urgent = ($mail instanceof Message && $mail->isUrgent());
 		if ($urgent === false && $this->configuration->isUseQueue() === true) {
-			$this->insertMessageToQueue($mail);
-		} else {
-			$mail->setPriority($urgent === true ? Message::HIGH : $mail->getPriority() ?? Message::NORMAL);
-			$this->sendNow($mail);
+			return $this->insertMessageToQueue($mail);
 		}
+		$mail->setPriority($urgent === true ? Message::HIGH : $mail->getPriority() ?? Message::NORMAL);
+
+		return $this->sendNow($mail);
 	}
 
 
-	public function sendNow(NetteMessage $message): void
+	public function sendNow(NetteMessage $message): Email
 	{
 		$email = $this->insertMessageToQueue($message);
 		if ($email->getStatus() === Email::STATUS_SENT) {
-			return;
+			return $email;
 		}
 		try {
 			$this->sender->send($this->messageEntity->toMessage($email->getMessage()));
@@ -98,6 +98,8 @@ final class Emailer implements Mailer
 			$email->setSendEarliestNextAttemptAt(new \DateTimeImmutable('now + 10 seconds'));
 		}
 		$this->entityManager->flush();
+
+		return $email;
 	}
 
 
