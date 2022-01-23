@@ -28,7 +28,7 @@ class Email
 	#[ORM\Id]
 	#[ORM\Column(type: 'integer', unique: true, options: ['unsigned' => true])]
 	#[ORM\GeneratedValue]
-	protected ?int $id;
+	private int $id;
 
 	#[ORM\OneToOne(targetEntity: DoctrineMessage::class)]
 	private DoctrineMessage $message;
@@ -94,13 +94,9 @@ class Email
 	}
 
 
-	public function getId(): ?int
+	public function getId(): int
 	{
-		if ($this->id === null) {
-			throw new \RuntimeException('Entity ID does not exist yet. Did you call ->persist() method first?');
-		}
-
-		return (int) $this->id;
+		return $this->id;
 	}
 
 
