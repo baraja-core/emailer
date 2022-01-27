@@ -67,15 +67,15 @@ final class Emailer implements Mailer
 	 * When sending messages, please prefer own Message entity from this package.
 	 * Attachments will be physically stored on disk.
 	 */
-	public function send(NetteMessage $mail): Email
+	public function send(NetteMessage $mail): void
 	{
 		$urgent = ($mail instanceof Message && $mail->isUrgent());
 		if ($urgent === false && $this->configuration->isUseQueue() === true) {
-			return $this->insertMessageToQueue($mail);
+			$this->insertMessageToQueue($mail);
+			return;
 		}
 		$mail->setPriority($urgent === true ? Message::HIGH : $mail->getPriority() ?? Message::NORMAL);
-
-		return $this->sendNow($mail);
+		$this->sendNow($mail);
 	}
 
 
@@ -289,7 +289,7 @@ final class Emailer implements Mailer
 	}
 
 
-	private function insertMessageToQueue(NetteMessage $message, string $sendEarliestAt = 'now'): Email
+	public function insertMessageToQueue(NetteMessage $message, string $sendEarliestAt = 'now'): Email
 	{
 		if (trim($message->getBody()) === '' && trim($message->getHtmlBody()) === '') {
 			throw new \InvalidArgumentException(__METHOD__ . ': Empty mail (no body)');
