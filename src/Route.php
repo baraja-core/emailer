@@ -37,7 +37,7 @@ final class Route
 		string $presenter = self::DEFAULT_PRESENTER,
 		string $action = self::DEFAULT_ACTION,
 		string $id = null,
-		array $params = []
+		array $params = [],
 	) {
 		$this->module = $module ?: null;
 		$this->presenterName = trim(Strings::firstUpper($presenter ?: self::DEFAULT_PRESENTER), '/');

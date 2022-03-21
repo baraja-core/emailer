@@ -52,7 +52,7 @@ final class Emailer implements Mailer
 		private ?LoggerInterface $psrLogger,
 		string $attachmentBasePath,
 		array $config,
-		?Fixer $fixer = null
+		?Fixer $fixer = null,
 	) {
 		$this->messageEntity = new MessageEntity($attachmentBasePath, $entityManager);
 		$this->logger = new EmailerLogger($entityManager);
@@ -148,7 +148,7 @@ final class Emailer implements Mailer
 	public function getEmailServiceByType(
 		string $type,
 		array $parameters = [],
-		bool $overwriteMailParameter = true
+		bool $overwriteMailParameter = true,
 	): MessageReadyToSend {
 		if (class_exists($type) === false) {
 			throw new \InvalidArgumentException('Service class "' . $type . '" does not exist.');

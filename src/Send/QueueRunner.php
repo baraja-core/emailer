@@ -29,7 +29,7 @@ final class QueueRunner
 	public function __construct(
 		private EntityManagerInterface $entityManager,
 		private ?LoggerInterface $psrLogger,
-		Emailer $emailer
+		Emailer $emailer,
 	) {
 		$this->configuration = $emailer->getConfiguration();
 		$this->sender = $emailer->getSender();
@@ -53,7 +53,7 @@ final class QueueRunner
 			$emails = (new Paginator(
 				(new EntityRepository(
 					$this->entityManager,
-					$this->entityManager->getClassMetadata(Email::class)
+					$this->entityManager->getClassMetadata(Email::class),
 				))
 					->createQueryBuilder('email')
 					->select('email, message')

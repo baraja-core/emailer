@@ -11,7 +11,7 @@ use Baraja\Emailer\Message;
 abstract class BaseEmail implements Email
 {
 	public function __construct(
-		protected Configuration $configuration
+		protected Configuration $configuration,
 	) {
 	}
 

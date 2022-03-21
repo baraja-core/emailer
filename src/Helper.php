@@ -71,7 +71,7 @@ final class Helper
 			$alpha,
 			$alpha,
 			$alpha,
-			$alpha
+			$alpha,
 		);
 
 		return (bool) preg_match($pattern, $value);

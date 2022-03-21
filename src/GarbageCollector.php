@@ -32,7 +32,7 @@ final class GarbageCollector
 		/** @var array<int, Log> $logs */
 		$logs = (new EntityRepository(
 			$this->entityManager,
-			$this->entityManager->getClassMetadata(Log::class)
+			$this->entityManager->getClassMetadata(Log::class),
 		))
 			->createQueryBuilder('log')
 			->select('PARTIAL log.{id}')
@@ -52,7 +52,7 @@ final class GarbageCollector
 		/** @var array<int, Log> $logs */
 		$logs = (new EntityRepository(
 			$this->entityManager,
-			$this->entityManager->getClassMetadata(Log::class)
+			$this->entityManager->getClassMetadata(Log::class),
 		))
 			->createQueryBuilder('log')
 			->select('PARTIAL log.{id}')
@@ -72,7 +72,7 @@ final class GarbageCollector
 		/** @var Email[] $emails */
 		$emails = (new EntityRepository(
 			$this->entityManager,
-			$this->entityManager->getClassMetadata(Email::class)
+			$this->entityManager->getClassMetadata(Email::class),
 		))
 			->createQueryBuilder('email')
 			->select('email, message')

@@ -37,7 +37,7 @@ final class Configuration
 		?string $tempDir = null,
 		bool $useQueue = false,
 		array $adminEmails = [],
-		?string $defaultFrom = null
+		?string $defaultFrom = null,
 	) {
 		$this->tempDir = $tempDir ?? sys_get_temp_dir() . '/emailer';
 		$this->useQueue = $useQueue;

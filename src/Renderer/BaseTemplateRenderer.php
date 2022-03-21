@@ -34,7 +34,7 @@ abstract class BaseTemplateRenderer implements Renderer
 		Localization $localization,
 		LinkGenerator $linkGenerator,
 		?Translator $translator = null,
-		array $defaultParameters = []
+		array $defaultParameters = [],
 	): void {
 		$this->tempDir = $tempDir;
 		$this->localization = $localization;

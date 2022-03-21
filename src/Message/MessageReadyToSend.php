@@ -9,7 +9,7 @@ final class MessageReadyToSend
 {
 	public function __construct(
 		private Message $message,
-		private Emailer $emailer
+		private Emailer $emailer,
 	) {
 	}
 

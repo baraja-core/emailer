@@ -11,7 +11,6 @@ use Nette\Localization\Translator;
 
 final class TemplateRenderer
 {
-
 	/** @var string[] (format => package name) */
 	private static array $hintRendererPackages = [];
 
@@ -27,7 +26,7 @@ final class TemplateRenderer
 		array $renderers,
 		Localization $localization,
 		LinkGenerator $linkGenerator,
-		?Translator $translator = null
+		?Translator $translator = null,
 	) {
 		$renderers[] = new TextRenderer;
 		$renderers[] = new HtmlRenderer;
