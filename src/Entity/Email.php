@@ -28,7 +28,7 @@ class Email
 	#[ORM\Id]
 	#[ORM\Column(type: 'integer', unique: true, options: ['unsigned' => true])]
 	#[ORM\GeneratedValue]
-	private int $id;
+	protected int $id;
 
 	#[ORM\OneToOne(targetEntity: DoctrineMessage::class)]
 	private DoctrineMessage $message;

@@ -16,7 +16,7 @@ final class Helper
 
 	public static function formatDurationFrom(int $fromMicroTime, ?int $nowMicroTime = null): string
 	{
-		$microTime = ($nowMicroTime ?: (int) microtime(true)) - $fromMicroTime;
+		$microTime = ($nowMicroTime ?? (int) microtime(true)) - $fromMicroTime;
 
 		return $microTime >= 1
 			? number_format($microTime, 3, '.', ' ') . ' s'

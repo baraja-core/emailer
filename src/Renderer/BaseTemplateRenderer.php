@@ -147,6 +147,6 @@ abstract class BaseTemplateRenderer implements Renderer
 
 	private function safeHtmlSpecialChars(string $haystack): string
 	{
-		return (string) str_replace('-&gt;', '->', htmlspecialchars($haystack, ENT_QUOTES));
+		return str_replace('-&gt;', '->', htmlspecialchars($haystack, ENT_QUOTES));
 	}
 }

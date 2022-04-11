@@ -31,7 +31,7 @@ class Log
 	#[ORM\Id]
 	#[ORM\Column(type: 'integer', unique: true, options: ['unsigned' => true])]
 	#[ORM\GeneratedValue]
-	private int $id;
+	protected int $id;
 
 	#[ORM\Column(type: 'smallint')]
 	private int $level;

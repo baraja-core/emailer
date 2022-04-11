@@ -12,11 +12,11 @@ final class DefaultFixer implements Fixer
 
 	public function fix(string $email): string
 	{
-		if (preg_match('/^([^@]+)@([^@]+)\.([a-z]{1,6})$/', strtolower(trim($email)), $emailParser)) {
+		if (preg_match('/^([^@]+)@([^@]+)\.([a-z]{1,6})$/', strtolower(trim($email)), $emailParser) === 1) {
 			[, $user, $domainName, $tld] = $emailParser;
 			$domain = $domainName . '.' . $tld;
 		} else {
-			throw new \InvalidArgumentException('Email "' . $email . '" is in invalid format.');
+			throw new \InvalidArgumentException(sprintf('Email "%s" is in invalid format.', $email));
 		}
 		if (\in_array($domain, self::DOMAINS, true)) {
 			return $email;
