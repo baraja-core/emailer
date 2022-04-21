@@ -151,7 +151,7 @@ final class Emailer implements Mailer
 		bool $overwriteMailParameter = true,
 	): MessageReadyToSend {
 		if (class_exists($type) === false) {
-			throw new \InvalidArgumentException('Service class "' . $type . '" does not exist.');
+			throw new \InvalidArgumentException(sprintf('Service class "%s" does not exist.', $type));
 		}
 
 		try {
@@ -159,7 +159,7 @@ final class Emailer implements Mailer
 			$email = $this->container->getByType($type);
 
 			if (!$email instanceof EmailService) {
-				throw new EmailerException('Service "' . $type . '" must be type of "' . EmailService::class . '".');
+				throw new EmailerException(sprintf('Service "%s" must be type of "%s".', $type, EmailService::class));
 			}
 		} catch (MissingServiceException $e) {
 			throw new EmailerException($e->getMessage(), $e->getCode(), $e);
@@ -172,21 +172,21 @@ final class Emailer implements Mailer
 
 		try {
 			$locale = $parameters['locale'] ?? $this->localization->getLocale();
+			assert(is_string($locale));
 		} catch (\Throwable) {
 			$locale = $this->localization->getDefaultLocale();
 		}
 
 		$templatePath = $email->getTemplate($locale);
 		if ($templatePath === null) {
-			throw new EmailerException(
-				'Email template for mail "' . $type . '" and locale "' . $locale . '" does not exist.',
-			);
+			throw new EmailerException(sprintf('Email template for mail "%s" and locale "%s" does not exist.', $type, $locale));
 		}
 
 		$subject = $parameters['subject'] ?? $message->getSubject();
 		if (PHP_SAPI !== 'cli' && $this->translator !== null) {
 			$subject = $this->translator->translate($subject, $parameters);
 		}
+		assert(is_string($subject));
 
 		$message->setLocale($locale);
 		$message->setSubject($subject);
@@ -199,13 +199,22 @@ final class Emailer implements Mailer
 		if ($from === null) {
 			throw new \InvalidArgumentException('Parameter "from" does not exist. Did you defined default configuration?');
 		}
+		if (is_string($from) === false) {
+			throw new \InvalidArgumentException(sprintf('From must be a string, but "%s" given.', get_debug_type($from)));
+		}
 
 		$message->setFrom($this->fixer->fix($from));
 		if (isset($parameters['to']) === true) {
+			if (is_string($parameters['to']) === false) {
+				throw new \InvalidArgumentException(sprintf('To must be a string, but "%s" given.', get_debug_type($parameters['to'])));
+			}
 			$message->clearHeader('To');
 			$message->addTo($this->fixer->fix($parameters['to']));
 		}
 		if (isset($parameters['cc']) === true) {
+			if (is_string($parameters['cc']) === false && is_array($parameters['cc']) === false) {
+				throw new \InvalidArgumentException(sprintf('Cc must be a string or array, but "%s" given.', get_debug_type($parameters['cc'])));
+			}
 			$message->clearHeader('Cc');
 			foreach ((array) $parameters['cc'] as $ccs) {
 				foreach (explode(';', $ccs) as $cc) {
@@ -216,6 +225,9 @@ final class Emailer implements Mailer
 			}
 		}
 		if (isset($parameters['bcc']) === true) {
+			if (is_string($parameters['bcc']) === false) {
+				throw new \InvalidArgumentException(sprintf('Bcc must be a string, but "%s" given.', get_debug_type($parameters['bcc'])));
+			}
 			$message->clearHeader('Bcc');
 			foreach (explode(';', $parameters['bcc']) as $bcc) {
 				if (Helper::isEmail($bcc)) {
@@ -224,6 +236,9 @@ final class Emailer implements Mailer
 			}
 		}
 		if (isset($parameters['sendEarliestAt']) === true) {
+			/**
+			 * @phpstan-ignore-next-line
+			 */
 			$message->setSendEarliestAt($parameters['sendEarliestAt']);
 		}
 

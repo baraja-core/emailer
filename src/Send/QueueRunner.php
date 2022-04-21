@@ -88,7 +88,7 @@ final class QueueRunner
 				echo 'E';
 
 				$this->logger->log(
-					level: Log::LEVEL_ERROR,
+					level: Log::LevelError,
 					message: 'Failed to send: ' . $e->getMessage() . ', details has been logged.',
 					email: $email,
 				);
@@ -114,7 +114,7 @@ final class QueueRunner
 			usleep((int) ($this->configuration->getQueueEmailDelay() * 1_000 * 1_000));
 		}
 
-		$this->logger->log(Log::LEVEL_INFO, 'FINISHED: sender was running for ' . Helper::formatDurationFrom((int) $startTime) . ' and it sent ' . $result . ' e-mails');
+		$this->logger->log(Log::LevelInfo, 'FINISHED: sender was running for ' . Helper::formatDurationFrom((int) $startTime) . ' and it sent ' . $result . ' e-mails');
 
 		return $result;
 	}
@@ -145,7 +145,7 @@ final class QueueRunner
 		$email->setDatetimeSent(new \DateTimeImmutable('now'));
 
 		$this->logger->log(
-			Log::LEVEL_INFO,
+			Log::LevelInfo,
 			'E-mail was successfully sent to '
 			. '"' . $email->getMessage()->getTo() . '" '
 			. 'with subject "' . trim($message->getSubject() ?? 'NULL') . '". '

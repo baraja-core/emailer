@@ -9,13 +9,12 @@ use Nette\Utils\Strings;
 
 final class Route
 {
-	public const DEFAULT_PRESENTER = 'Homepage';
+	public const
+		DefaultPresenter = 'Homepage',
+		DefaultAction = 'default',
+		DefaultRoute = 'Homepage:default';
 
-	public const DEFAULT_ACTION = 'default';
-
-	public const DEFAULT_ROUTE = 'Homepage:default';
-
-	private const PATTERN = '/^(?:(?<module>[A-Za-z]*):)?(?<presenter>[A-Za-z]*):(?<action>[A-Za-z]+)(?<params>\,*?.*?)$/';
+	private const Pattern = '/^(?:(?<module>[A-Za-z]*):)?(?<presenter>[A-Za-z]*):(?<action>[A-Za-z]+)(?<params>\,*?.*?)$/';
 
 	private ?string $module;
 
@@ -25,25 +24,25 @@ final class Route
 
 	private ?string $id;
 
-	/** @var string[] */
+	/** @var array<string, string> */
 	private array $params;
 
 
 	/**
-	 * @param mixed[] $params
+	 * @param array<string, string> $params
 	 */
 	public function __construct(
 		string $module = null,
-		string $presenter = self::DEFAULT_PRESENTER,
-		string $action = self::DEFAULT_ACTION,
+		string $presenter = self::DefaultPresenter,
+		string $action = self::DefaultAction,
 		string $id = null,
 		array $params = [],
 	) {
 		$this->module = $module !== '' ? $module : null;
-		$presenterName = trim(Strings::firstUpper($presenter !== '' ? $presenter : self::DEFAULT_PRESENTER), '/');
-		$actionName = trim(Strings::firstLower($action !== '' ? $action : self::DEFAULT_ACTION), '/');
-		$this->presenterName = $presenterName !== '' ? $presenterName : self::DEFAULT_PRESENTER;
-		$this->actionName = $actionName !== '' ? $actionName : self::DEFAULT_ACTION;
+		$presenterName = trim(Strings::firstUpper($presenter !== '' ? $presenter : self::DefaultPresenter), '/');
+		$actionName = trim(Strings::firstLower($action !== '' ? $action : self::DefaultAction), '/');
+		$this->presenterName = $presenterName !== '' ? $presenterName : self::DefaultPresenter;
+		$this->actionName = $actionName !== '' ? $actionName : self::DefaultAction;
 		$this->id = $id !== '' && $id !== null ? trim($id, '/') : null;
 		$this->params = $params;
 	}
@@ -54,8 +53,8 @@ final class Route
 	 */
 	public static function createByPattern(string $pattern): self
 	{
-		if (preg_match(self::PATTERN, trim($pattern, ':'), $patternParser) !== 1) {
-			throw new \InvalidArgumentException('Invalid link "' . htmlspecialchars($pattern) . '". Did you mean format "Presenter:action" or "Module:Presenter:action"?');
+		if (preg_match(self::Pattern, trim($pattern, ':'), $patternParser) !== 1) {
+			throw new \InvalidArgumentException(sprintf('Invalid link "%s". Did you mean format "Presenter:action" or "Module:Presenter:action"?', htmlspecialchars($pattern)));
 		}
 
 		$id = null;
@@ -139,12 +138,12 @@ final class Route
 
 	public function isDefault(): bool
 	{
-		return $this->getActionName() === self::DEFAULT_ACTION;
+		return $this->getActionName() === self::DefaultAction;
 	}
 
 
 	/**
-	 * @return mixed[]
+	 * @return array<string, int|mixed>
 	 */
 	public function getParams(): array
 	{

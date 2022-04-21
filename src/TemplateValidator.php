@@ -7,7 +7,7 @@ namespace Baraja\Emailer;
 
 final class TemplateValidator
 {
-	private const PATTERNS = [
+	private const Patterns = [
 		'latte' => '~{\$([a-zA-Z0-9_]+)~',
 		'twig' => '~{{\s*([a-zA-Z0-9_]+)~',
 		'txt' => '~{{\s*([a-zA-Z0-9_]+)~',
@@ -36,8 +36,8 @@ final class TemplateValidator
 	public function hydrateParameters(string $content, string $format): array
 	{
 		if (
-			isset(self::PATTERNS[$format])
-			&& preg_match_all(self::PATTERNS[$format], $content, $parser) > 0
+			isset(self::Patterns[$format])
+			&& preg_match_all(self::Patterns[$format], $content, $parser) > 0
 		) {
 			return $parser[1] ?? [];
 		}

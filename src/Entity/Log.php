@@ -12,20 +12,20 @@ use Doctrine\ORM\Mapping as ORM;
 class Log
 {
 	public const
-		LEVEL_WARNING = 'WARNING',
-		LEVEL_ERROR = 'ERROR',
-		LEVEL_INFO = 'INFO';
+		LevelWarning = 'WARNING',
+		LevelError = 'ERROR',
+		LevelInfo = 'INFO';
 
-	public const LEVEL_TO_INT = [
-		self::LEVEL_INFO => 1,
-		self::LEVEL_WARNING => 2,
-		self::LEVEL_ERROR => 5,
+	public const LevelToInt = [
+		self::LevelInfo => 1,
+		self::LevelWarning => 2,
+		self::LevelError => 5,
 	];
 
-	public const INT_TO_LEVEL = [
-		1 => self::LEVEL_INFO,
-		2 => self::LEVEL_WARNING,
-		5 => self::LEVEL_ERROR,
+	public const IntToLevel = [
+		1 => self::LevelInfo,
+		2 => self::LevelWarning,
+		5 => self::LevelError,
 	];
 
 	#[ORM\Id]
@@ -49,12 +49,12 @@ class Log
 	public function __construct(string $level, string $message, ?Email $email = null)
 	{
 		$level = strtoupper($level);
-		if (\in_array($level, [self::LEVEL_WARNING, self::LEVEL_ERROR, self::LEVEL_INFO], true) === false) {
+		if (\in_array($level, [self::LevelWarning, self::LevelError, self::LevelInfo], true) === false) {
 			trigger_error(__METHOD__ . ': Level "' . $level . '" is not supported.');
-			$level = self::LEVEL_ERROR;
+			$level = self::LevelError;
 		}
 
-		$this->level = self::LEVEL_TO_INT[$level];
+		$this->level = self::LevelToInt[$level];
 		$this->message = $message;
 		$this->email = $email;
 		$this->insertedDate = new \DateTimeImmutable('now');
@@ -76,7 +76,7 @@ class Log
 	/** Formatted level name. */
 	public function getLevel(): string
 	{
-		return self::INT_TO_LEVEL[$this->level];
+		return self::IntToLevel[$this->level];
 	}
 
 

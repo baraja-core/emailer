@@ -15,6 +15,14 @@ use Nette\Schema\Expect;
 use Nette\Schema\Schema;
 use Nette\Utils\FileSystem;
 
+/**
+ * @method array{
+ *    mail: array<string, mixed>,
+ *    useQueue: bool,
+ *    adminEmails: array<int, string>,
+ *    defaultFrom?: string
+ * } getConfig()
+ */
 final class EmailerExtension extends CompilerExtension
 {
 	/**
@@ -31,7 +39,7 @@ final class EmailerExtension extends CompilerExtension
 		return Expect::structure([
 			'mail' => Expect::array(),
 			'useQueue' => Expect::bool(true),
-			'adminEmails' => Expect::arrayOf(Expect::string()),
+			'adminEmails' => Expect::arrayOf(Expect::string())->default([]),
 			'defaultFrom' => Expect::string(),
 		])->castTo('array');
 	}
@@ -56,7 +64,6 @@ final class EmailerExtension extends CompilerExtension
 			throw new \LogicException('Mailer service is broken: ' . $e->getMessage(), $e->getCode(), $e);
 		}
 
-		/** @var array<string, mixed> $config */
 		$config = $this->getConfig();
 
 		if (isset($builder->parameters['tempDir']) === false) {
@@ -67,8 +74,8 @@ final class EmailerExtension extends CompilerExtension
 			->setFactory(Configuration::class)
 			->setArguments([
 				'tempDir' => $builder->parameters['tempDir'],
-				'useQueue' => $config['useQueue'] ?? true,
-				'adminEmails' => $config['adminEmails'] ?? [],
+				'useQueue' => $config['useQueue'],
+				'adminEmails' => $config['adminEmails'],
 				'defaultFrom' => $config['defaultFrom'] ?? null,
 			]);
 
@@ -87,7 +94,7 @@ final class EmailerExtension extends CompilerExtension
 
 		$builder->addDefinition($this->prefix('emailer'))
 			->setFactory(Emailer::class)
-			->setArgument('config', array_merge($dicMailConfiguration, $config['mail'] ?? []))
+			->setArgument('config', array_merge($dicMailConfiguration, $config['mail']))
 			->setArgument('attachmentBasePath', $attachmentBasePath);
 
 		$builder->addAccessorDefinition($this->prefix('emailerAccessor'))

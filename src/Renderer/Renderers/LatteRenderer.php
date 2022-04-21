@@ -24,6 +24,12 @@ final class LatteRenderer extends BaseTemplateRenderer
 		if (isset($parameters['templatePath']) === false) {
 			throw new \RuntimeException('Latte Engine require real disk path: Template path does not exist.');
 		}
+		if (is_string($parameters['templatePath']) === false) {
+			throw new \RuntimeException(sprintf(
+				'Latte Engine require real disk path: Template path must be a string, but type "%s" given.',
+				get_debug_type($parameters['templatePath']),
+			));
+		}
 
 		return $this->getEngine()->renderToString($parameters['templatePath'], $parameters);
 	}

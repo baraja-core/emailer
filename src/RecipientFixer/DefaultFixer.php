@@ -7,22 +7,22 @@ namespace Baraja\Emailer\RecipientFixer;
 
 final class DefaultFixer implements Fixer
 {
-	private const DOMAINS = ['seznam.cz', 'gmail.com', 'zoznam.sk', 'centrum.cz', 'atlas.cz', 'atlas.sk'];
+	private const Domains = ['seznam.cz', 'gmail.com', 'zoznam.sk', 'centrum.cz', 'atlas.cz', 'atlas.sk'];
 
 
 	public function fix(string $email): string
 	{
 		if (preg_match('/^([^@]+)@([^@]+)\.([a-z]{1,6})$/', strtolower(trim($email)), $emailParser) === 1) {
 			[, $user, $domainName, $tld] = $emailParser;
-			$domain = $domainName . '.' . $tld;
+			$domain = sprintf('%s.%s', $domainName, $tld);
 		} else {
 			throw new \InvalidArgumentException(sprintf('Email "%s" is in invalid format.', $email));
 		}
-		if (\in_array($domain, self::DOMAINS, true)) {
+		if (in_array($domain, self::Domains, true)) {
 			return $email;
 		}
 
-		return $user . '@' . ($this->getSuggestion($domain, $tld) ?? $domain);
+		return sprintf('%s@%s', $user, $this->getSuggestion($domain, $tld) ?? $domain);
 	}
 
 
@@ -33,7 +33,7 @@ final class DefaultFixer implements Fixer
 	{
 		$best = null;
 		$min = (strlen($value) / 4 + 1) * 10 + .1;
-		foreach (self::DOMAINS as $item) {
+		foreach (self::Domains as $item) {
 			if ((explode('.', $item)[1] ?? '') !== $tld) {
 				continue;
 			}

@@ -86,28 +86,33 @@ abstract class BaseTemplateRenderer implements Renderer
 					$renderParameters = [];
 					foreach ($parameters as $parameterName => $parameterValue) {
 						$escapeParamValue = static function (self $renderer, $value) {
-							if (strncmp($value, '$', 1) === 0) {
+							if (str_contains($value, '$')) {
 								return $value;
 							}
 							if (is_string($value)) {
-								return '"' . $renderer->safeHtmlSpecialChars($value) . '"';
+								return sprintf('"%s"', $renderer->safeHtmlSpecialChars($value));
 							}
 
 							return $value;
 						};
 
-						$renderParameters[] = '"' . $parameterName . '" => ' . $escapeParamValue($this, $parameterValue);
+						$renderParameters[] = sprintf('"%s" => %s', $parameterName,  $escapeParamValue($this, $parameterValue));
 					}
 
-					$route = ($route->getModule() ?? 'Front')
-						. ':' . $route->getPresenterName(true)
-						. ':' . $route->getActionName();
+					$routeString = sprintf(
+						'%s:%s:%s',
+						$route->getModule() ?? 'Front',
+						$route->getPresenterName(true),
+						$route->getActionName(),
+					);
 
-					return 'href="{$linkGenerator->link('
-						. '"' . htmlspecialchars(str_replace('Front:Front:', 'Front:', $route), ENT_QUOTES) . '", '
-						. '[' . implode(', ', $renderParameters) . '])}"';
+					return sprintf(
+						'href="{$linkGenerator->link("%s", [%s])}"',
+						htmlspecialchars(str_replace('Front:Front:', 'Front:', $routeString), ENT_QUOTES),
+						implode(', ', $renderParameters),
+					);
 				} catch (InvalidLinkException) {
-					return 'href="' . Url::get()->getBaseUrl() . '"';
+					return sprintf('href="%s"', Url::get()->getBaseUrl());
 				}
 			},
 			$template,

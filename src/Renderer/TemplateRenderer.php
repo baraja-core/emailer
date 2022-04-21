@@ -11,10 +11,10 @@ use Nette\Localization\Translator;
 
 final class TemplateRenderer
 {
-	/** @var string[] (format => package name) */
+	/** @var array<string, string> (format => package name) */
 	private static array $hintRendererPackages = [];
 
-	/** @var Renderer[] */
+	/** @var array<int, Renderer> */
 	private array $renderers;
 
 
