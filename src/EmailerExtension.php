@@ -52,8 +52,8 @@ final class EmailerExtension extends CompilerExtension
 			OrmAnnotationsExtension::addAnnotationPathToManager($builder, 'Baraja\Emailer\Entity', __DIR__ . '/Entity');
 		}
 		try {
-			/** @var ServiceDefinition $netteMailer */
 			$netteMailer = $builder->getDefinition('mail.mailer');
+			assert($netteMailer instanceof ServiceDefinition);
 			$netteMailerArguments = $netteMailer->getFactory()->arguments;
 			if (isset($netteMailerArguments[0]) === true) {
 				$netteMailerArguments = $netteMailerArguments[0];
