@@ -236,7 +236,6 @@ final class Emailer implements Mailer
 			}
 		}
 		if (isset($parameters['sendEarliestAt']) === true) {
-			/** @phpstan-ignore-next-line */
 			$message->setSendEarliestAt($parameters['sendEarliestAt']);
 		}
 
@@ -251,7 +250,6 @@ final class Emailer implements Mailer
 	{
 		if ($this->templateRenderer === null) {
 			$linkGenerator = $this->container->getByType(LinkGenerator::class);
-			assert($linkGenerator instanceof LinkGenerator);
 
 			/** @var Renderer[] $renderers */
 			$renderers = [];
