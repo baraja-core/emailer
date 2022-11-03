@@ -14,8 +14,6 @@ final class Route
 		DefaultAction = 'default',
 		DefaultRoute = 'Homepage:default';
 
-	private const Pattern = '/^(?:(?<module>[A-Za-z]*):)?(?<presenter>[A-Za-z]*):(?<action>[A-Za-z]+)(?<params>\,*?.*?)$/';
-
 	private ?string $module;
 
 	private string $presenterName;
@@ -53,8 +51,15 @@ final class Route
 	 */
 	public static function createByPattern(string $pattern): self
 	{
-		if (preg_match(self::Pattern, trim($pattern, ':'), $patternParser) !== 1) {
-			throw new \InvalidArgumentException(sprintf('Invalid link "%s". Did you mean format "Presenter:action" or "Module:Presenter:action"?', htmlspecialchars($pattern)));
+		if (preg_match(
+			'/^(?:(?<module>[A-Za-z]*):)?(?<presenter>[A-Za-z]*):(?<action>[A-Za-z]+)(?<params>\,*?.*?)$/',
+			trim($pattern, ':'),
+			$patternParser,
+		) !== 1) {
+			throw new \InvalidArgumentException(sprintf(
+				'Invalid link "%s". Did you mean format "Presenter:action" or "Module:Presenter:action"?',
+				htmlspecialchars($pattern),
+			));
 		}
 
 		$id = null;
@@ -65,19 +70,16 @@ final class Route
 				if ($paramKey === 'id') {
 					$id = $paramParser['value'];
 				}
-
-				$params[$paramKey] = \is_string($paramParser['value'])
-					? trim($paramParser['value'], '\'"')
-					: $paramParser['value'];
+				$params[$paramKey] = trim($paramParser['value'], '\'"');
 			}
 		}
 
 		return new self(
-			$patternParser['module'] ?? null,
-			$patternParser['presenter'],
-			$patternParser['action'],
-			$id,
-			$params,
+			module: $patternParser['module'] ?? null,
+			presenter: $patternParser['presenter'],
+			action: $patternParser['action'],
+			id: $id,
+			params: $params,
 		);
 	}
 
@@ -118,15 +120,15 @@ final class Route
 
 	public function getPresenterName(bool $withModule = true): string
 	{
-		if ($withModule === true) {
-			$module = $this->module === null || trim($this->module) === ''
-				? 'Front:'
-				: $this->module . ':';
-
-			return $module . $this->presenterName;
-		}
-
-		return $this->presenterName;
+		return $withModule
+			? sprintf(
+				'%s%s',
+				$this->module === null || trim($this->module) === ''
+					? 'Front:'
+					: $this->module . ':',
+				$this->presenterName,
+			)
+			: $this->presenterName;
 	}
 
 
@@ -143,7 +145,7 @@ final class Route
 
 
 	/**
-	 * @return array<string, int|mixed>
+	 * @return array<string, string|int>
 	 */
 	public function getParams(): array
 	{
