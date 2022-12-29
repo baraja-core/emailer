@@ -28,8 +28,8 @@ final class QueueRunner
 
 	public function __construct(
 		private EntityManagerInterface $entityManager,
-		private ?LoggerInterface $psrLogger,
 		Emailer $emailer,
+		private ?LoggerInterface $psrLogger = null,
 	) {
 		$this->configuration = $emailer->getConfiguration();
 		$this->sender = $emailer->getSender();

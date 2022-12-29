@@ -48,10 +48,10 @@ final class Emailer implements Mailer
 		private EntityManagerInterface $entityManager,
 		private Container $container,
 		private Localization $localization,
-		private ?Translator $translator,
-		private ?LoggerInterface $psrLogger,
 		string $attachmentBasePath,
 		array $config,
+		private ?Translator $translator = null,
+		private ?LoggerInterface $psrLogger = null,
 		?Fixer $fixer = null,
 	) {
 		$this->messageEntity = new MessageEntity($attachmentBasePath, $entityManager);
