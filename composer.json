@@ -10,9 +10,9 @@
 	],
 	"require": {
 		"php": "^8.0",
-		"nette/mail": "^3.0",
-		"nette/utils": "^3.0",
-		"latte/latte": "^2.5",
+		"nette/mail": "^3.0 || ^4.0",
+		"nette/utils": "^3.0 || ^4.0",
+		"latte/latte": "^2.5 || ^3.0",
 		"baraja-core/localization": "^2.0",
 		"baraja-core/dynamic-configuration": "^2.0",
 		"baraja-core/html-to-text": "^2.0",

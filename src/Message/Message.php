@@ -16,7 +16,7 @@ final class Message extends \Nette\Mail\Message
 	private ?string $locale = null;
 
 
-	public function addTo(string $email, string $name = null): self
+	public function addTo(string $email, ?string $name = null): static
 	{
 		if ($this->getHeader('To') === null) {
 			parent::addTo($email, $name);
@@ -28,7 +28,7 @@ final class Message extends \Nette\Mail\Message
 	}
 
 
-	public function setPriority(int $priority): self
+	public function setPriority(int $priority): static
 	{
 		if ($priority < 0) {
 			$priority = 0;
@@ -38,6 +38,18 @@ final class Message extends \Nette\Mail\Message
 		}
 
 		parent::setPriority($priority);
+
+		return $this;
+	}
+
+
+	public function setHtmlBody(string $html, ?string $basePath = null): static
+	{
+		$hasText = $this->getBody() !== '';
+		parent::setHtmlBody($html, $basePath);
+		if ($hasText === false && $html !== '') {
+			$this->setBody($this->buildText($html));
+		}
 
 		return $this;
 	}
